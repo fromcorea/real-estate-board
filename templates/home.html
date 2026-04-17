@@ -90,7 +90,14 @@
                             </div>
                         </div>
                         <div class="card-footer bg-transparent border-0 pt-0">
-                            <small class="text-muted">{{ prop.created_at|date:"m.d" }} | 조회 {{ prop.view_count }}</small>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">{{ prop.created_at|date:"m.d" }} | 조회 {{ prop.view_count }}</small>
+                                <button class="btn btn-sm btn-outline-secondary py-0 px-1 share-btn"
+                                        onclick="event.preventDefault(); shareProperty('{{ prop.title|escapejs }}', '{{ prop.price_display|escapejs }}', '{{ prop.address|escapejs }}', {{ prop.pk }});"
+                                        title="공유하기">
+                                    <i class="bi bi-share" style="font-size:0.75rem;"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </a>
@@ -128,4 +135,32 @@
     </div>
 </section>
 {% endif %}
+
+<!-- Share Toast -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1070;">
+    <div id="shareToast" class="toast align-items-center text-bg-success border-0" role="alert">
+        <div class="d-flex">
+            <div class="toast-body"><i class="bi bi-check-circle me-2"></i>링크가 복사되었습니다.</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function shareProperty(title, price, address, pk) {
+    const url = window.location.origin + '/listings/' + pk + '/';
+    const text = title + ' - ' + price + ' | ' + address;
+
+    if (navigator.share) {
+        navigator.share({ title: title, text: text, url: url });
+    } else {
+        navigator.clipboard.writeText(url).then(() => {
+            const toast = new bootstrap.Toast(document.getElementById('shareToast'));
+            toast.show();
+        });
+    }
+}
+</script>
 {% endblock %}
