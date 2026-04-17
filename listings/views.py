@@ -111,7 +111,7 @@ class PropertyDetailView(DetailView):
         return ctx
 
 
-class PropertyCreateView(LoginRequiredMixin, CreateView):
+class PropertyCreateView(CreateView):
     model = Property
     form_class = PropertyForm
     template_name = 'listings/property_form.html'
@@ -125,12 +125,11 @@ class PropertyCreateView(LoginRequiredMixin, CreateView):
         return ctx
 
     def form_valid(self, form):
-        ctx = self.get_context_data()
-        image_formset = ctx['image_formset']
-        form.instance.author = self.request.user
+        if self.request.user.is_authenticated:
+            form.instance.author = self.request.user
         self.object = form.save()
+        image_formset = PropertyImageFormSet(self.request.POST, self.request.FILES, instance=self.object)
         if image_formset.is_valid():
-            image_formset.instance = self.object
             images = image_formset.save()
             if images and not any(img.is_thumbnail for img in images):
                 images[0].is_thumbnail = True
@@ -144,7 +143,8 @@ class PropertyUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     template_name = 'listings/property_form.html'
 
     def test_func(self):
-        return self.get_object().author == self.request.user
+        obj = self.get_object()
+        return obj.author is None or obj.author == self.request.user
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)

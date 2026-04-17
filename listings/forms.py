@@ -8,12 +8,10 @@ class PropertyForm(forms.ModelForm):
         fields = [
             'title', 'property_type', 'trade_type', 'price', 'deposit', 'monthly_rent',
             'address', 'address_detail', 'latitude', 'longitude',
-            'area', 'rooms', 'bathrooms', 'floor', 'direction', 'heating',
-            'parking', 'maintenance_fee', 'available_date', 'description',
+            'area', 'description',
         ]
         widgets = {
-            'description': forms.Textarea(attrs={'rows': 6}),
-            'available_date': forms.DateInput(attrs={'type': 'date'}),
+            'description': forms.Textarea(attrs={'rows': 10, 'id': 'id_description'}),
             'latitude': forms.HiddenInput(),
             'longitude': forms.HiddenInput(),
         }

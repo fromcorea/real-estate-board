@@ -1,5 +1,12 @@
+import uuid
+
 from django.conf import settings
 from django.db import models
+
+
+def property_image_path(instance, filename):
+    ext = filename.rsplit('.', 1)[-1] if '.' in filename else 'jpg'
+    return f'properties/{uuid.uuid4().hex}.{ext}'
 
 
 class Property(models.Model):
@@ -34,7 +41,8 @@ class Property(models.Model):
     ]
 
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
-                               related_name='properties', verbose_name='등록자')
+                               related_name='properties', verbose_name='등록자',
+                               null=True, blank=True)
     title = models.CharField('제목', max_length=100)
     description = models.TextField('매물 설명')
     property_type = models.CharField('매물유형', max_length=20, choices=PROPERTY_TYPE_CHOICES)
@@ -55,7 +63,7 @@ class Property(models.Model):
     parking = models.BooleanField('주차 가능', null=True, blank=True)
     maintenance_fee = models.PositiveIntegerField('관리비(만원)', null=True, blank=True)
     available_date = models.DateField('입주가능일', null=True, blank=True)
-    status = models.CharField('상태', max_length=20, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField('상태', max_length=20, choices=STATUS_CHOICES, default='approved')
     is_available = models.BooleanField('거래 가능', default=True)
     view_count = models.PositiveIntegerField('조회수', default=0)
     created_at = models.DateTimeField('등록일', auto_now_add=True)
@@ -104,7 +112,7 @@ class Property(models.Model):
 class PropertyImage(models.Model):
     property = models.ForeignKey(Property, on_delete=models.CASCADE,
                                  related_name='images', verbose_name='매물')
-    image = models.ImageField('이미지', upload_to='properties/%Y/%m/')
+    image = models.ImageField('이미지', upload_to=property_image_path)
     is_thumbnail = models.BooleanField('대표이미지', default=False)
     order = models.PositiveSmallIntegerField('순서', default=0)
     created_at = models.DateTimeField('등록일', auto_now_add=True)
