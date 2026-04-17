@@ -1,0 +1,351 @@
+{% extends 'base.html' %}
+{% block title %}{{ property.title }} - 집구하자{% endblock %}
+
+{% block content %}
+<div class="container py-3 py-md-4">
+    <!-- Mobile Back Button -->
+    <div class="d-flex align-items-center mb-3">
+        <a href="javascript:history.back()" class="btn btn-sm btn-outline-secondary me-2">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <nav aria-label="breadcrumb" class="d-none d-md-block mb-0">
+            <ol class="breadcrumb mb-0 small">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">홈</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'listings:list' %}">매물 목록</a></li>
+                <li class="breadcrumb-item active text-truncate" style="max-width:200px;">{{ property.title }}</li>
+            </ol>
+        </nav>
+        <span class="d-md-none fw-semibold text-truncate">{{ property.title }}</span>
+    </div>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Image Gallery -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-0">
+                    {% with images=property.images.all %}
+                    {% if images %}
+                    <div class="position-relative">
+                        <img id="mainImage" src="{{ images.0.image.url }}" class="w-100 rounded-top" style="max-height:480px;object-fit:cover;" alt="{{ property.title }}">
+                        {% if not property.is_available %}
+                        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center rounded-top" style="background:rgba(0,0,0,0.5);">
+                            <span class="badge bg-secondary fs-4 px-4 py-2">거래완료</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% if images|length > 1 %}
+                    <div class="d-flex gap-2 p-3 overflow-auto">
+                        {% for img in images %}
+                        <img src="{{ img.image.url }}" class="gallery-thumb {% if forloop.first %}active{% endif %}"
+                             onclick="document.getElementById('mainImage').src=this.src; document.querySelectorAll('.gallery-thumb').forEach(t=>t.classList.remove('active')); this.classList.add('active');"
+                             alt="이미지 {{ forloop.counter }}">
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <img src="https://placehold.co/800x480/e2e8f0/64748b?text=No+Image" class="w-100 rounded-top" alt="이미지 없음">
+                    {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+
+            <!-- Property Info -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start mb-3 detail-price-wrap">
+                        <div>
+                            <span class="badge bg-{% if property.trade_type == 'sale' %}danger{% elif property.trade_type == 'jeonse' %}primary{% else %}success{% endif %} mb-2">{{ property.get_trade_type_display }}</span>
+                            <span class="badge bg-info mb-2">{{ property.get_property_type_display }}</span>
+                            <h3 class="fw-bold mb-1">{{ property.title }}</h3>
+                            <p class="text-muted mb-0"><i class="bi bi-geo-alt me-1"></i>{{ property.address }} {{ property.address_detail }}</p>
+                        </div>
+                        <h3 class="text-primary fw-bold text-nowrap ms-md-3 mt-2 mt-md-0">{{ property.price_display }}</h3>
+                    </div>
+
+                    <!-- Desktop: 4-column table -->
+                    <table class="table info-table mb-0 d-none d-md-table">
+                        <tr>
+                            <th>매물유형</th><td>{{ property.get_property_type_display }}</td>
+                            <th>거래유형</th><td>{{ property.get_trade_type_display }}</td>
+                        </tr>
+                        <tr>
+                            <th>면적</th><td>{{ property.area }}m&sup2; ({{ property.area_pyeong }}평)</td>
+                            <th>방/화장실</th><td>{{ property.rooms }}방 / {{ property.bathrooms }}화장실</td>
+                        </tr>
+                        {% if property.floor %}
+                        <tr>
+                            <th>층수</th><td>{{ property.floor }}층</td>
+                            <th>방향</th><td>{{ property.get_direction_display|default:"-" }}</td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <th>난방</th><td>{{ property.get_heating_display|default:"-" }}</td>
+                            <th>주차</th><td>{% if property.parking == True %}가능{% elif property.parking == False %}불가{% else %}-{% endif %}</td>
+                        </tr>
+                        {% if property.maintenance_fee %}
+                        <tr>
+                            <th>관리비</th><td>{{ property.maintenance_fee }}만원</td>
+                            <th>입주가능일</th><td>{{ property.available_date|date:"Y-m-d"|default:"협의" }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if property.trade_type == 'monthly' %}
+                        <tr>
+                            <th>보증금</th><td>{{ property.deposit|default:0 }}만원</td>
+                            <th>월세</th><td>{{ property.monthly_rent|default:0 }}만원</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+
+                    <!-- Mobile: 2-column table -->
+                    <table class="table info-table mb-0 d-md-none">
+                        <tr><th>매물유형</th><td>{{ property.get_property_type_display }}</td></tr>
+                        <tr><th>거래유형</th><td>{{ property.get_trade_type_display }}</td></tr>
+                        <tr><th>면적</th><td>{{ property.area }}m&sup2; ({{ property.area_pyeong }}평)</td></tr>
+                        <tr><th>방 수</th><td>{{ property.rooms }}방</td></tr>
+                        <tr><th>화장실</th><td>{{ property.bathrooms }}개</td></tr>
+                        {% if property.floor %}
+                        <tr><th>층수</th><td>{{ property.floor }}층</td></tr>
+                        {% endif %}
+                        {% if property.direction %}
+                        <tr><th>방향</th><td>{{ property.get_direction_display }}</td></tr>
+                        {% endif %}
+                        <tr><th>난방</th><td>{{ property.get_heating_display|default:"-" }}</td></tr>
+                        <tr><th>주차</th><td>{% if property.parking == True %}가능{% elif property.parking == False %}불가{% else %}-{% endif %}</td></tr>
+                        {% if property.maintenance_fee %}
+                        <tr><th>관리비</th><td>{{ property.maintenance_fee }}만원</td></tr>
+                        {% endif %}
+                        {% if property.available_date %}
+                        <tr><th>입주가능일</th><td>{{ property.available_date|date:"Y-m-d" }}</td></tr>
+                        {% endif %}
+                        {% if property.trade_type == 'monthly' %}
+                        <tr><th>보증금</th><td>{{ property.deposit|default:0 }}만원</td></tr>
+                        <tr><th>월세</th><td>{{ property.monthly_rent|default:0 }}만원</td></tr>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">매물 설명</h5>
+                    <p style="white-space:pre-line;">{{ property.description }}</p>
+                </div>
+            </div>
+
+            <!-- Map Placeholder -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-geo-alt me-2"></i>위치</h5>
+                    <div id="map" class="rounded bg-light d-flex align-items-center justify-content-center" style="height:300px;">
+                        {% if property.latitude and property.longitude %}
+                        <p class="text-muted mb-0"><i class="bi bi-map me-2"></i>지도 영역 (위도: {{ property.latitude }}, 경도: {{ property.longitude }})</p>
+                        {% else %}
+                        <p class="text-muted mb-0"><i class="bi bi-map me-2"></i>위치 정보가 없습니다.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Author Info -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body text-center">
+                    {% if property.author.profile_image %}
+                    <img src="{{ property.author.profile_image.url }}" class="rounded-circle mb-3" width="80" height="80" style="object-fit:cover;" alt="프로필">
+                    {% else %}
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width:80px;height:80px;font-size:2rem;">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    {% endif %}
+                    <h5 class="fw-bold mb-1">{{ property.author.name|default:property.author.username }}</h5>
+                    {% if property.author.is_agent %}
+                    <span class="badge bg-warning text-dark mb-2"><i class="bi bi-patch-check-fill me-1"></i>공인중개사</span>
+                    {% endif %}
+                    {% if property.author.phone %}
+                    <p class="mb-2"><i class="bi bi-telephone me-2"></i>{{ property.author.phone }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-grid gap-2 mb-4">
+                {% if user.is_authenticated %}
+                <button class="btn {% if is_bookmarked %}btn-danger{% else %}btn-outline-danger{% endif %} btn-lg" id="bookmarkBtn" onclick="toggleBookmark()">
+                    <i class="bi bi-heart{% if is_bookmarked %}-fill{% endif %} me-2" id="bookmarkIcon"></i>
+                    <span id="bookmarkText">{% if is_bookmarked %}북마크 해제{% else %}북마크 추가{% endif %}</span>
+                </button>
+                {% else %}
+                <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn btn-outline-danger btn-lg">
+                    <i class="bi bi-heart me-2"></i>북마크 (로그인 필요)
+                </a>
+                {% endif %}
+
+                <!-- 공유하기 -->
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary w-100" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-share me-2"></i>공유하기
+                    </button>
+                    <ul class="dropdown-menu w-100">
+                        <li><a class="dropdown-item" href="#" onclick="shareKakao(); return false;"><i class="bi bi-chat-fill text-warning me-2"></i>카카오톡</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="shareTwitter(); return false;"><i class="bi bi-twitter-x me-2"></i>X (트위터)</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="shareFacebook(); return false;"><i class="bi bi-facebook text-primary me-2"></i>페이스북</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" onclick="copyLink(); return false;"><i class="bi bi-link-45deg me-2"></i>링크 복사</a></li>
+                    </ul>
+                </div>
+
+                {% if user.is_authenticated and user != property.author %}
+                <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#reportModal">
+                    <i class="bi bi-flag me-2"></i>신고하기
+                </button>
+                {% endif %}
+            </div>
+
+            <!-- 링크 복사 완료 토스트 -->
+            <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1070;">
+                <div id="copyToast" class="toast align-items-center text-bg-success border-0" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body"><i class="bi bi-check-circle me-2"></i>링크가 복사되었습니다.</div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Owner Actions -->
+            {% if user == property.author %}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">매물 관리</h6>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'listings:edit' property.pk %}" class="btn btn-outline-primary">
+                            <i class="bi bi-pencil me-1"></i>수정
+                        </a>
+                        {% if property.is_available %}
+                        <form method="post" action="{% url 'listings:complete' property.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-success w-100" onclick="return confirm('거래완료 처리하시겠습니까?');">
+                                <i class="bi bi-check-circle me-1"></i>거래완료
+                            </button>
+                        </form>
+                        {% endif %}
+                        <a href="{% url 'listings:delete' property.pk %}" class="btn btn-outline-danger">
+                            <i class="bi bi-trash me-1"></i>삭제
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Meta Info -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between text-muted small">
+                        <span><i class="bi bi-eye me-1"></i>조회 {{ property.view_count }}</span>
+                        <span><i class="bi bi-clock me-1"></i>{{ property.created_at|date:"Y.m.d H:i" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Report Modal -->
+{% if user.is_authenticated and user != property.author %}
+<div class="modal fade" id="reportModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-flag me-2"></i>매물 신고</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'listings:report' property.pk %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="id_reason" class="form-label">신고 사유</label>
+                        <select name="reason" id="id_reason" class="form-select" required>
+                            <option value="">선택하세요</option>
+                            {% for value, label in report_form.fields.reason.choices %}
+                            {% if value %}
+                            <option value="{{ value }}">{{ label }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_description" class="form-label">상세 사유</label>
+                        <textarea name="description" id="id_description" class="form-control" rows="4" placeholder="신고 사유를 자세히 적어주세요."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-warning">신고하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const shareTitle = '{{ property.title|escapejs }}';
+const shareText = '{{ property.price_display|escapejs }} | {{ property.address|escapejs }}';
+const shareUrl = window.location.href;
+
+function copyLink() {
+    navigator.clipboard.writeText(shareUrl).then(() => {
+        const toast = new bootstrap.Toast(document.getElementById('copyToast'));
+        toast.show();
+    });
+}
+
+function shareTwitter() {
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle + ' ' + shareText)}&url=${encodeURIComponent(shareUrl)}`;
+    window.open(url, '_blank', 'width=600,height=400');
+}
+
+function shareFacebook() {
+    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+    window.open(url, '_blank', 'width=600,height=400');
+}
+
+function shareKakao() {
+    if (navigator.share) {
+        navigator.share({ title: shareTitle, text: shareText, url: shareUrl });
+    } else {
+        copyLink();
+    }
+}
+
+function toggleBookmark() {
+    fetch('{% url "listings:bookmark_toggle" property.pk %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(r => r.json())
+    .then(data => {
+        const btn = document.getElementById('bookmarkBtn');
+        const icon = document.getElementById('bookmarkIcon');
+        const text = document.getElementById('bookmarkText');
+        if (data.bookmarked) {
+            btn.className = 'btn btn-danger btn-lg';
+            icon.className = 'bi bi-heart-fill me-2';
+            text.textContent = '북마크 해제';
+        } else {
+            btn.className = 'btn btn-outline-danger btn-lg';
+            icon.className = 'bi bi-heart me-2';
+            text.textContent = '북마크 추가';
+        }
+    });
+}
+</script>
+{% endblock %}

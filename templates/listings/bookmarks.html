@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}북마크 - 집구하자{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h3 class="fw-bold mb-4"><i class="bi bi-heart me-2"></i>북마크</h3>
+
+    <div class="row g-3">
+        {% for bookmark in bookmarks %}
+        {% with prop=bookmark.property %}
+        <div class="col-md-4 col-lg-3">
+            <div class="card property-card h-100 shadow-sm">
+                <a href="{% url 'listings:detail' prop.pk %}" class="text-decoration-none">
+                    <div class="position-relative">
+                        {% if prop.thumbnail %}
+                        <img src="{{ prop.thumbnail.image.url }}" class="card-img-top" alt="{{ prop.title }}">
+                        {% else %}
+                        <img src="https://placehold.co/400x250/e2e8f0/64748b?text=No+Image" class="card-img-top" alt="이미지 없음">
+                        {% endif %}
+                        <span class="badge bg-{% if prop.trade_type == 'sale' %}danger{% elif prop.trade_type == 'jeonse' %}primary{% else %}success{% endif %} position-absolute top-0 start-0 m-2">{{ prop.get_trade_type_display }}</span>
+                        {% if not prop.is_available %}
+                        <span class="badge bg-secondary position-absolute top-0 end-0 m-2">거래완료</span>
+                        {% endif %}
+                    </div>
+                </a>
+                <button class="bookmark-btn position-absolute text-danger"
+                        style="top:8px;right:8px;z-index:2;"
+                        onclick="removeBookmark({{ prop.pk }}, this)" title="북마크 해제">
+                    <i class="bi bi-heart-fill"></i>
+                </button>
+                <a href="{% url 'listings:detail' prop.pk %}" class="text-decoration-none">
+                    <div class="card-body">
+                        <h6 class="text-primary fw-bold mb-1">{{ prop.price_display }}</h6>
+                        <p class="card-title fw-semibold mb-1 text-dark text-truncate">{{ prop.title }}</p>
+                        <p class="text-muted small mb-2 text-truncate"><i class="bi bi-geo-alt"></i> {{ prop.address }}</p>
+                        <div class="d-flex gap-3 text-muted small">
+                            <span>{{ prop.area }}m&sup2;</span>
+                            <span>{{ prop.rooms }}방</span>
+                            {% if prop.floor %}<span>{{ prop.floor }}층</span>{% endif %}
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        {% endwith %}
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <i class="bi bi-heart display-1 text-muted"></i>
+            <p class="text-muted mt-3">북마크한 매물이 없습니다.</p>
+            <a href="{% url 'listings:list' %}" class="btn btn-primary">매물 검색하러 가기</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function removeBookmark(propertyId, btn) {
+    fetch(`/listings/${propertyId}/bookmark/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (!data.bookmarked) {
+            btn.closest('.col-md-4').remove();
+            if (!document.querySelector('.property-card')) {
+                location.reload();
+            }
+        }
+    });
+}
+</script>
+{% endblock %}

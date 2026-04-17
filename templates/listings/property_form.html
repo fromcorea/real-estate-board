@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block title %}{% if object %}매물 수정{% else %}매물 등록{% endif %} - 집구하자{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h3 class="fw-bold mb-4">
+                <i class="bi bi-{% if object %}pencil{% else %}plus-circle{% endif %} me-2"></i>
+                {% if object %}매물 수정{% else %}매물 등록{% endif %}
+            </h3>
+
+            {% if form.errors %}
+            <div class="alert alert-danger">
+                <h6 class="fw-bold"><i class="bi bi-exclamation-triangle me-2"></i>입력 오류</h6>
+                <ul class="mb-0">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                    <li>{{ field.label }}: {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+
+                <!-- Basic Info -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white fw-bold"><i class="bi bi-info-circle me-2"></i>기본 정보</div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="id_title" class="form-label">제목 <span class="text-danger">*</span></label>
+                            {{ form.title|add_class:"form-control" }}
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_property_type" class="form-label">매물유형 <span class="text-danger">*</span></label>
+                                {{ form.property_type|add_class:"form-select" }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_trade_type" class="form-label">거래유형 <span class="text-danger">*</span></label>
+                                {{ form.trade_type|add_class:"form-select" }}
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-4 mb-3">
+                                <label for="id_price" class="form-label">매매가/전세금 (만원) <span class="text-danger">*</span></label>
+                                {{ form.price|add_class:"form-control" }}
+                            </div>
+                            <div class="col-md-4 mb-3" id="depositField">
+                                <label for="id_deposit" class="form-label">보증금 (만원)</label>
+                                {{ form.deposit|add_class:"form-control" }}
+                            </div>
+                            <div class="col-md-4 mb-3" id="monthlyRentField">
+                                <label for="id_monthly_rent" class="form-label">월세 (만원)</label>
+                                {{ form.monthly_rent|add_class:"form-control" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white fw-bold"><i class="bi bi-geo-alt me-2"></i>위치 정보</div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="id_address" class="form-label">주소 <span class="text-danger">*</span></label>
+                            {{ form.address|add_class:"form-control" }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_address_detail" class="form-label">상세주소</label>
+                            {{ form.address_detail|add_class:"form-control" }}
+                        </div>
+                        {{ form.latitude }}
+                        {{ form.longitude }}
+                    </div>
+                </div>
+
+                <!-- Details -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white fw-bold"><i class="bi bi-list-check me-2"></i>상세 정보</div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4 mb-3">
+                                <label for="id_area" class="form-label">면적 (m&sup2;) <span class="text-danger">*</span></label>
+                                {{ form.area|add_class:"form-control" }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="id_rooms" class="form-label">방 수 <span class="text-danger">*</span></label>
+                                {{ form.rooms|add_class:"form-control" }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="id_bathrooms" class="form-label">화장실 수 <span class="text-danger">*</span></label>
+                                {{ form.bathrooms|add_class:"form-control" }}
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-4 mb-3">
+                                <label for="id_floor" class="form-label">층수</label>
+                                {{ form.floor|add_class:"form-control" }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="id_direction" class="form-label">방향</label>
+                                {{ form.direction|add_class:"form-select" }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="id_heating" class="form-label">난방</label>
+                                {{ form.heating|add_class:"form-select" }}
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-4 mb-3">
+                                <label for="id_parking" class="form-label">주차 가능</label>
+                                {{ form.parking|add_class:"form-select" }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="id_maintenance_fee" class="form-label">관리비 (만원)</label>
+                                {{ form.maintenance_fee|add_class:"form-control" }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="id_available_date" class="form-label">입주가능일</label>
+                                {{ form.available_date|add_class:"form-control" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Images -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white fw-bold"><i class="bi bi-images me-2"></i>이미지</div>
+                    <div class="card-body">
+                        {{ image_formset.management_form }}
+                        {% for img_form in image_formset %}
+                        <div class="mb-3 p-3 bg-light rounded">
+                            <div class="d-flex align-items-center gap-3">
+                                <span class="fw-semibold">이미지 {{ forloop.counter }}</span>
+                                <div class="flex-grow-1">
+                                    {% for field in img_form.visible_fields %}
+                                    {% if field.name == 'image' %}
+                                    {{ field|add_class:"form-control form-control-sm" }}
+                                    {% elif field.name == 'DELETE' %}
+                                    <div class="form-check mt-1">
+                                        {{ field }} <label class="form-check-label small text-danger" for="{{ field.id_for_label }}">삭제</label>
+                                    </div>
+                                    {% else %}
+                                    {{ field }}
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                                {% for field in img_form.hidden_fields %}{{ field }}{% endfor %}
+                            </div>
+                            {% if img_form.instance.pk and img_form.instance.image %}
+                            <div class="mt-2">
+                                <img src="{{ img_form.instance.image.url }}" class="rounded" style="max-height:80px;" alt="현재 이미지">
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        <small class="text-muted">최대 10장까지 업로드 가능합니다. 첫 번째 이미지가 대표 이미지로 설정됩니다.</small>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white fw-bold"><i class="bi bi-text-paragraph me-2"></i>매물 설명</div>
+                    <div class="card-body">
+                        {{ form.description|add_class:"form-control" }}
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg px-4">
+                        <i class="bi bi-check-lg me-1"></i>{% if object %}수정하기{% else %}등록하기{% endif %}
+                    </button>
+                    {% if object %}
+                    <a href="{% url 'listings:detail' object.pk %}" class="btn btn-outline-secondary btn-lg">취소</a>
+                    {% else %}
+                    <a href="{% url 'listings:list' %}" class="btn btn-outline-secondary btn-lg">취소</a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const tradeType = document.getElementById('id_trade_type');
+    const depositField = document.getElementById('depositField');
+    const monthlyRentField = document.getElementById('monthlyRentField');
+
+    function toggleRentFields() {
+        const val = tradeType.value;
+        if (val === 'monthly') {
+            depositField.style.display = '';
+            monthlyRentField.style.display = '';
+        } else {
+            depositField.style.display = 'none';
+            monthlyRentField.style.display = 'none';
+        }
+    }
+    tradeType.addEventListener('change', toggleRentFields);
+    toggleRentFields();
+</script>
+{% endblock %}

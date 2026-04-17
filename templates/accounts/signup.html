@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block title %}회원가입 - 집구하자{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <h3 class="text-center fw-bold mb-4"><i class="bi bi-person-plus me-2"></i>회원가입</h3>
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label for="id_username" class="form-label">아이디 <span class="text-danger">*</span></label>
+                            {{ form.username|add_class:"form-control" }}
+                            {% if form.username.errors %}
+                            <div class="invalid-feedback d-block">{{ form.username.errors.0 }}</div>
+                            {% endif %}
+                            <small class="text-muted">{{ form.username.help_text }}</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_email" class="form-label">이메일</label>
+                            {{ form.email|add_class:"form-control" }}
+                            {% if form.email.errors %}
+                            <div class="invalid-feedback d-block">{{ form.email.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_name" class="form-label">이름 <span class="text-danger">*</span></label>
+                            {{ form.name|add_class:"form-control" }}
+                            {% if form.name.errors %}
+                            <div class="invalid-feedback d-block">{{ form.name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_phone" class="form-label">전화번호</label>
+                            {{ form.phone|add_class:"form-control" }}
+                            {% if form.phone.errors %}
+                            <div class="invalid-feedback d-block">{{ form.phone.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_password1" class="form-label">비밀번호 <span class="text-danger">*</span></label>
+                            {{ form.password1|add_class:"form-control" }}
+                            {% if form.password1.errors %}
+                            <div class="invalid-feedback d-block">{{ form.password1.errors.0 }}</div>
+                            {% endif %}
+                            <small class="text-muted">{{ form.password1.help_text }}</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_password2" class="form-label">비밀번호 확인 <span class="text-danger">*</span></label>
+                            {{ form.password2|add_class:"form-control" }}
+                            {% if form.password2.errors %}
+                            <div class="invalid-feedback d-block">{{ form.password2.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <hr>
+
+                        <div class="mb-3 form-check">
+                            {{ form.is_agent }}
+                            <label class="form-check-label" for="id_is_agent">공인중개사입니다</label>
+                        </div>
+
+                        <div class="mb-3" id="business-number-field" style="display:none;">
+                            <label for="id_business_number" class="form-label">사업자등록번호</label>
+                            {{ form.business_number|add_class:"form-control" }}
+                            {% if form.business_number.errors %}
+                            <div class="invalid-feedback d-block">{{ form.business_number.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <hr>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="terms" required>
+                            <label class="form-check-label" for="terms">이용약관에 동의합니다 <span class="text-danger">*</span></label>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="privacy" required>
+                            <label class="form-check-label" for="privacy">개인정보 처리방침에 동의합니다 <span class="text-danger">*</span></label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+                            <i class="bi bi-check-circle me-1"></i>가입하기
+                        </button>
+                    </form>
+
+                    <p class="text-center mt-3 mb-0">
+                        이미 계정이 있으신가요? <a href="{% url 'accounts:login' %}">로그인</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const isAgentCheckbox = document.getElementById('id_is_agent');
+    const businessField = document.getElementById('business-number-field');
+    function toggleBusiness() {
+        businessField.style.display = isAgentCheckbox.checked ? 'block' : 'none';
+    }
+    isAgentCheckbox.addEventListener('change', toggleBusiness);
+    toggleBusiness();
+</script>
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block title %}집구하자 - 내 집을 찾는 가장 쉬운 방법{% endblock %}
+
+{% block content %}
+<section class="hero-section text-center text-white">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-3">내 집을 찾는 가장 쉬운 방법</h1>
+        <p class="lead mb-4">전국 부동산 매물을 한눈에 검색하고, 직접 등록하세요.</p>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <form method="get" action="{% url 'listings:list' %}">
+                    <!-- Desktop -->
+                    <div class="input-group input-group-lg shadow d-none d-md-flex">
+                        <select name="property_type" class="form-select" style="max-width: 160px;">
+                            <option value="">전체</option>
+                            <option value="apartment">아파트</option>
+                            <option value="villa">빌라</option>
+                            <option value="officetel">오피스텔</option>
+                            <option value="oneroom">원룸</option>
+                            <option value="store">상가</option>
+                            <option value="land">토지</option>
+                        </select>
+                        <input type="text" name="keyword" class="form-control" placeholder="지역, 주소, 단지명으로 검색">
+                        <button class="btn btn-warning px-4" type="submit">
+                            <i class="bi bi-search"></i> 검색
+                        </button>
+                    </div>
+                    <!-- Mobile -->
+                    <div class="d-md-none">
+                        <div class="input-group shadow">
+                            <input type="text" name="keyword" class="form-control" placeholder="지역, 주소, 단지명 검색">
+                            <button class="btn btn-warning px-3" type="submit">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center g-3">
+            {% for value, label in property_types %}
+            <div class="col-4 col-md-2">
+                <a href="{% url 'listings:list' %}?property_type={{ value }}" class="text-decoration-none">
+                    <div class="category-card p-4 rounded-3 bg-white shadow-sm">
+                        <i class="bi bi-{% if value == 'apartment' %}building{% elif value == 'villa' %}houses{% elif value == 'officetel' %}hospital{% elif value == 'oneroom' %}door-open{% elif value == 'store' %}shop{% else %}tree{% endif %} display-4 text-primary"></i>
+                        <p class="mt-2 mb-0 fw-semibold text-dark">{{ label }}</p>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold mb-0">최신 매물</h2>
+            <a href="{% url 'listings:list' %}" class="text-decoration-none">전체보기 <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <div class="row g-3">
+            {% for prop in latest_properties %}
+            <div class="col-6 col-md-3">
+                <a href="{% url 'listings:detail' prop.pk %}" class="text-decoration-none">
+                    <div class="card property-card h-100 shadow-sm">
+                        <div class="position-relative">
+                            {% if prop.thumbnail %}
+                            <img src="{{ prop.thumbnail.image.url }}" class="card-img-top" alt="{{ prop.title }}">
+                            {% else %}
+                            <img src="https://placehold.co/400x250/e2e8f0/64748b?text=No+Image" class="card-img-top" alt="이미지 없음">
+                            {% endif %}
+                            <span class="badge bg-{% if prop.trade_type == 'sale' %}danger{% elif prop.trade_type == 'jeonse' %}primary{% else %}success{% endif %} position-absolute top-0 end-0 m-2">{{ prop.get_trade_type_display }}</span>
+                            {% if not prop.is_available %}
+                            <span class="badge bg-secondary position-absolute bottom-0 end-0 m-2">거래완료</span>
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            <h6 class="text-primary fw-bold mb-1">{{ prop.price_display }}</h6>
+                            <p class="card-title fw-semibold mb-1 text-dark">{{ prop.title }}</p>
+                            <p class="text-muted small mb-2"><i class="bi bi-geo-alt"></i> {{ prop.address }}</p>
+                            <div class="d-flex gap-3 text-muted small">
+                                <span>{{ prop.area }}m2</span>
+                                <span>{{ prop.rooms }}방</span>
+                                {% if prop.floor %}<span>{{ prop.floor }}층</span>{% endif %}
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 pt-0">
+                            <small class="text-muted">{{ prop.created_at|date:"m.d" }} | 조회 {{ prop.view_count }}</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-house display-1 text-muted"></i>
+                <p class="text-muted mt-3">등록된 매물이 없습니다.</p>
+                {% if user.is_authenticated %}
+                <a href="{% url 'listings:create' %}" class="btn btn-primary">첫 매물 등록하기</a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{% if notices %}
+<section class="py-4 bg-light">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0"><i class="bi bi-megaphone me-2"></i>공지사항</h5>
+            <a href="{% url 'listings:notice_list' %}" class="text-decoration-none small">전체보기 <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <ul class="list-group list-group-flush bg-transparent">
+            {% for notice in notices %}
+            <li class="list-group-item bg-transparent d-flex justify-content-between">
+                <a href="{% url 'listings:notice_detail' notice.pk %}" class="text-decoration-none text-dark">
+                    {% if notice.is_pinned %}<span class="badge bg-danger me-2">중요</span>{% endif %}{{ notice.title }}
+                </a>
+                <small class="text-muted">{{ notice.created_at|date:"Y.m.d" }}</small>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

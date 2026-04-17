@@ -1,0 +1,93 @@
+<!-- Keyword -->
+<div class="mb-3">
+    <label class="form-label small fw-semibold">키워드</label>
+    <input type="text" name="keyword" class="form-control" placeholder="지역, 주소, 단지명"
+           value="{{ params.keyword|default:'' }}">
+</div>
+
+<!-- Property Type -->
+<div class="mb-3">
+    <label class="form-label small fw-semibold">매물유형</label>
+    <div class="d-flex flex-wrap gap-1">
+        <button type="submit" name="property_type" value=""
+                class="btn btn-sm {% if not params.property_type %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+            전체
+        </button>
+        {% for value, label in property_types %}
+        <button type="submit" name="property_type" value="{{ value }}"
+                class="btn btn-sm {% if params.property_type == value %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+            {{ label }}
+        </button>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Trade Type -->
+<div class="mb-3">
+    <label class="form-label small fw-semibold">거래유형</label>
+    <div class="d-flex flex-wrap gap-1">
+        <button type="submit" name="trade_type" value=""
+                class="btn btn-sm {% if not params.trade_type %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+            전체
+        </button>
+        {% for value, label in trade_types %}
+        <button type="submit" name="trade_type" value="{{ value }}"
+                class="btn btn-sm {% if params.trade_type == value %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+            {{ label }}
+        </button>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Price Range -->
+<div class="mb-3">
+    <label class="form-label small fw-semibold">가격 (만원)</label>
+    <div class="row g-2">
+        <div class="col-6">
+            <input type="number" name="price_min" class="form-control form-control-sm"
+                   placeholder="최소" value="{{ params.price_min|default:'' }}">
+        </div>
+        <div class="col-6">
+            <input type="number" name="price_max" class="form-control form-control-sm"
+                   placeholder="최대" value="{{ params.price_max|default:'' }}">
+        </div>
+    </div>
+</div>
+
+<!-- Area Range -->
+<div class="mb-3">
+    <label class="form-label small fw-semibold">면적 (m&sup2;)</label>
+    <div class="row g-2">
+        <div class="col-6">
+            <input type="number" name="area_min" class="form-control form-control-sm"
+                   placeholder="최소" value="{{ params.area_min|default:'' }}">
+        </div>
+        <div class="col-6">
+            <input type="number" name="area_max" class="form-control form-control-sm"
+                   placeholder="최대" value="{{ params.area_max|default:'' }}">
+        </div>
+    </div>
+</div>
+
+<!-- Rooms -->
+<div class="mb-3">
+    <label class="form-label small fw-semibold">방 수</label>
+    <select name="rooms" class="form-select form-select-sm">
+        <option value="">전체</option>
+        <option value="1" {% if params.rooms == '1' %}selected{% endif %}>1방</option>
+        <option value="2" {% if params.rooms == '2' %}selected{% endif %}>2방</option>
+        <option value="3" {% if params.rooms == '3' %}selected{% endif %}>3방</option>
+        <option value="4" {% if params.rooms == '4' %}selected{% endif %}>4방 이상</option>
+    </select>
+</div>
+
+<!-- Ordering -->
+<div class="mb-3">
+    <label class="form-label small fw-semibold">정렬</label>
+    <select name="ordering" class="form-select form-select-sm">
+        <option value="-created_at" {% if params.ordering == '-created_at' or not params.ordering %}selected{% endif %}>최신순</option>
+        <option value="price" {% if params.ordering == 'price' %}selected{% endif %}>가격 낮은순</option>
+        <option value="-price" {% if params.ordering == '-price' %}selected{% endif %}>가격 높은순</option>
+        <option value="-view_count" {% if params.ordering == '-view_count' %}selected{% endif %}>조회순</option>
+    </select>
+</div>

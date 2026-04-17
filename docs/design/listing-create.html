@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>집구하자 - 매물 등록</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="common.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<!-- GNB -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="index.html">
+            <i class="bi bi-house-door-fill me-1"></i>집구하자
+        </a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="listing-list.html">매물 목록</a></li>
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle me-1"></i>홍길동
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#">로그아웃</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-4">
+    <div class="form-section">
+        <h3 class="fw-bold mb-4"><i class="bi bi-plus-circle me-2"></i>매물 등록</h3>
+
+        <form>
+            <!-- 기본 정보 -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3 text-primary">기본 정보</h5>
+
+                    <!-- 제목 -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">제목 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" placeholder="매물 제목을 입력하세요 (최대 100자)" maxlength="100">
+                        <div class="form-text text-end">0/100</div>
+                    </div>
+
+                    <div class="row">
+                        <!-- 매물 유형 -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">매물 유형 <span class="text-danger">*</span></label>
+                            <select class="form-select">
+                                <option>선택하세요</option>
+                                <option>아파트</option>
+                                <option>빌라</option>
+                                <option>오피스텔</option>
+                                <option>원룸</option>
+                                <option>상가</option>
+                                <option>토지</option>
+                            </select>
+                        </div>
+
+                        <!-- 거래 유형 -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">거래 유형 <span class="text-danger">*</span></label>
+                            <div class="d-flex gap-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="tradeType" id="tradeSale" checked>
+                                    <label class="form-check-label" for="tradeSale">매매</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="tradeType" id="tradeJeonse">
+                                    <label class="form-check-label" for="tradeJeonse">전세</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="tradeType" id="tradeMonthly">
+                                    <label class="form-check-label" for="tradeMonthly">월세</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 가격 (매매 선택 시) -->
+                    <div class="row" id="salePrice">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">매매가 <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" placeholder="예: 32000">
+                                <span class="input-group-text">만원</span>
+                            </div>
+                            <div class="form-text">3억 2,000만원</div>
+                        </div>
+                    </div>
+
+                    <!-- 가격 (월세 선택 시) -->
+                    <div class="row d-none" id="monthlyPrice">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">보증금 <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" placeholder="예: 500">
+                                <span class="input-group-text">만원</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">월세 <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" placeholder="예: 45">
+                                <span class="input-group-text">만원</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 위치 정보 -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3 text-primary">위치 정보</h5>
+
+                    <!-- 주소 검색 -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">주소 <span class="text-danger">*</span></label>
+                        <div class="input-group mb-2">
+                            <input type="text" class="form-control" placeholder="주소를 검색하세요" readonly id="addressInput" value="서울시 강남구 역삼동 123-45">
+                            <button class="btn btn-outline-primary" type="button">
+                                <i class="bi bi-search me-1"></i>주소 검색
+                            </button>
+                        </div>
+                        <!-- 지도 미리보기 -->
+                        <div class="bg-light rounded d-flex align-items-center justify-content-center mb-2" style="height: 200px;">
+                            <div class="text-center text-muted">
+                                <i class="bi bi-geo-alt display-4"></i>
+                                <p class="mt-2 small">주소 검색 시 카카오맵이 표시됩니다</p>
+                            </div>
+                        </div>
+                        <input type="hidden" id="latitude" value="">
+                        <input type="hidden" id="longitude" value="">
+                    </div>
+
+                    <!-- 상세 주소 -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">상세 주소</label>
+                        <input type="text" class="form-control" placeholder="동/호수 등 상세 주소 입력">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 상세 정보 -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3 text-primary">상세 정보</h5>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">면적 (m2) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" placeholder="예: 84" step="0.01">
+                            <div class="form-text">약 25.4평</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">방 수 <span class="text-danger">*</span></label>
+                            <select class="form-select">
+                                <option>1</option>
+                                <option>2</option>
+                                <option selected>3</option>
+                                <option>4</option>
+                                <option>5+</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">화장실 수 <span class="text-danger">*</span></label>
+                            <select class="form-select">
+                                <option>1</option>
+                                <option selected>2</option>
+                                <option>3</option>
+                                <option>4+</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">층수</label>
+                            <input type="number" class="form-control" placeholder="예: 12">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">방향</label>
+                            <select class="form-select">
+                                <option>선택하세요</option>
+                                <option>동향</option>
+                                <option>서향</option>
+                                <option selected>남향</option>
+                                <option>북향</option>
+                                <option>남동향</option>
+                                <option>남서향</option>
+                                <option>북동향</option>
+                                <option>북서향</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">난방 방식</label>
+                            <select class="form-select">
+                                <option>선택하세요</option>
+                                <option selected>개별난방</option>
+                                <option>중앙난방</option>
+                                <option>지역난방</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">관리비 (만원)</label>
+                            <input type="number" class="form-control" placeholder="예: 15">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">입주 가능일</label>
+                            <input type="date" class="form-control">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">주차</label>
+                            <div class="d-flex gap-3 mt-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="parking" id="parkingYes" checked>
+                                    <label class="form-check-label" for="parkingYes">가능</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="parking" id="parkingNo">
+                                    <label class="form-check-label" for="parkingNo">불가</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 사진 업로드 -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3 text-primary">
+                        사진 업로드
+                        <small class="text-muted fw-normal">(최대 10장)</small>
+                    </h5>
+
+                    <!-- 드래그앤드롭 영역 -->
+                    <div class="upload-zone mb-3">
+                        <i class="bi bi-cloud-arrow-up display-4 text-muted"></i>
+                        <p class="text-muted mt-2 mb-1">사진을 드래그하거나 클릭하여 업로드</p>
+                        <small class="text-muted">JPG, PNG, WebP / 장당 최대 10MB</small>
+                        <input type="file" class="d-none" multiple accept="image/*">
+                    </div>
+
+                    <!-- 업로드된 이미지 미리보기 -->
+                    <div class="d-flex gap-2 flex-wrap">
+                        <div class="position-relative">
+                            <img src="https://placehold.co/100x80/e2e8f0/64748b?text=1" class="upload-preview border" alt="">
+                            <span class="badge bg-primary position-absolute top-0 start-0" style="font-size: 0.6rem;">대표</span>
+                            <button class="btn btn-sm btn-danger position-absolute top-0 end-0" style="font-size: 0.5rem; padding: 0 4px;">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </div>
+                        <div class="position-relative">
+                            <img src="https://placehold.co/100x80/dbeafe/3b82f6?text=2" class="upload-preview border" alt="">
+                            <button class="btn btn-sm btn-danger position-absolute top-0 end-0" style="font-size: 0.5rem; padding: 0 4px;">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </div>
+                        <div class="position-relative">
+                            <img src="https://placehold.co/100x80/fef3c7/d97706?text=3" class="upload-preview border" alt="">
+                            <button class="btn btn-sm btn-danger position-absolute top-0 end-0" style="font-size: 0.5rem; padding: 0 4px;">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-text mt-2">첫 번째 사진이 대표 이미지입니다. 드래그하여 순서를 변경할 수 있습니다.</div>
+                </div>
+            </div>
+
+            <!-- 매물 설명 -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3 text-primary">매물 설명</h5>
+                    <textarea class="form-control" rows="8" placeholder="매물에 대한 상세 설명을 입력하세요.&#10;&#10;예시:&#10;- 매물의 장점&#10;- 주변 환경 (교통, 학교, 편의시설)&#10;- 리모델링 여부&#10;- 기타 특이사항"></textarea>
+                    <div class="form-text text-end">0/2000</div>
+                </div>
+            </div>
+
+            <!-- 제출 -->
+            <div class="d-flex gap-2 justify-content-end mb-5">
+                <button type="button" class="btn btn-outline-secondary px-4">
+                    <i class="bi bi-eye me-1"></i>미리보기
+                </button>
+                <button type="button" class="btn btn-outline-secondary px-4" onclick="history.back()">취소</button>
+                <button type="submit" class="btn btn-primary px-5">
+                    <i class="bi bi-check-circle me-1"></i>등록하기
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

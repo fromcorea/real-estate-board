@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}{{ notice.title }} - 공지사항 - 집구하자{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">홈</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'listings:notice_list' %}">공지사항</a></li>
+            <li class="breadcrumb-item active">{{ notice.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <!-- 제목 -->
+            <div class="border-bottom pb-3 mb-4">
+                <h3 class="fw-bold mb-2">
+                    {% if notice.is_pinned %}<span class="badge bg-danger me-2">중요</span>{% endif %}
+                    {{ notice.title }}
+                </h3>
+                <div class="d-flex gap-3 text-muted small">
+                    <span><i class="bi bi-person me-1"></i>{{ notice.author.name|default:notice.author.username }}</span>
+                    <span><i class="bi bi-clock me-1"></i>{{ notice.created_at|date:"Y.m.d H:i" }}</span>
+                    {% if notice.updated_at != notice.created_at %}
+                    <span><i class="bi bi-pencil me-1"></i>수정: {{ notice.updated_at|date:"Y.m.d H:i" }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- 내용 -->
+            <div class="notice-content" style="min-height: 200px; line-height: 1.8; white-space: pre-line;">{{ notice.content }}</div>
+        </div>
+    </div>
+
+    <!-- 하단 네비게이션 -->
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{% url 'listings:notice_list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-list me-1"></i>목록으로
+        </a>
+    </div>
+</div>
+{% endblock %}

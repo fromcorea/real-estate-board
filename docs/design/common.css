@@ -1,0 +1,150 @@
+/* 공통 스타일 */
+body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Hero */
+.hero-section {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    padding: 80px 0;
+}
+
+/* 카테고리 카드 */
+.category-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+.category-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+}
+
+/* 매물 카드 */
+.property-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+}
+.property-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12) !important;
+}
+.property-card .card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+/* 북마크 버튼 */
+.bookmark-btn {
+    background: rgba(0,0,0,0.3);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.bookmark-btn:hover {
+    background: rgba(0,0,0,0.5);
+}
+.bookmark-btn.active i {
+    color: #dc3545 !important;
+}
+
+/* 필터 사이드바 */
+.filter-sidebar {
+    position: sticky;
+    top: 80px;
+}
+
+/* 이미지 갤러리 */
+.gallery-main img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 12px;
+}
+.gallery-thumb {
+    width: 80px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+.gallery-thumb:hover,
+.gallery-thumb.active {
+    opacity: 1;
+    outline: 2px solid #0d6efd;
+}
+
+/* 상세 정보 테이블 */
+.info-table th {
+    width: 120px;
+    background: #f8f9fa;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* 지도 페이지 */
+.map-container {
+    height: calc(100vh - 56px);
+}
+.map-sidebar {
+    width: 360px;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+}
+
+/* 폼 */
+.form-section {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* 이미지 업로드 */
+.upload-zone {
+    border: 2px dashed #dee2e6;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+.upload-zone:hover {
+    border-color: #0d6efd;
+    background: #f0f7ff;
+}
+.upload-preview {
+    width: 100px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    position: relative;
+}
+
+/* 뱃지 */
+.badge-agent {
+    background: #198754;
+    font-size: 0.75rem;
+}
+
+/* 내 매물 관리 */
+.status-badge-pending { background: #ffc107; color: #000; }
+.status-badge-approved { background: #198754; }
+.status-badge-rejected { background: #dc3545; }
+.status-badge-completed { background: #6c757d; }
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .hero-section { padding: 50px 0; }
+    .hero-section h1 { font-size: 1.8rem; }
+    .map-sidebar { width: 100%; height: auto; }
+    .property-card .card-img-top { height: 160px; }
+}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}지도 보기 - 집구하자{% endblock %}
+
+{% block extra_css %}
+<style>
+    #map { height: calc(100vh - 56px); width: 100%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; }
+    .mobile-bottom-nav { display: none !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="map">
+    <div class="text-center text-muted">
+        <i class="bi bi-map display-1"></i>
+        <p class="mt-3 fs-5">지도 영역</p>
+        <p>Kakao Map API 연동 후 매물 위치가 표시됩니다.</p>
+        <p class="small">현재 {{ properties|length }}개의 매물 데이터가 로드되었습니다.</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const properties = [{% for p in properties %}{id:{{p.pk}}, title:"{{p.title|escapejs}}", lat:{{p.latitude|default:"null"}}, lng:{{p.longitude|default:"null"}}, price:"{{p.price_display|escapejs}}", trade_type:"{{p.trade_type}}"},{% endfor %}];
+</script>
+{% endblock %}
