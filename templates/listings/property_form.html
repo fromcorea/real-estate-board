@@ -142,7 +142,7 @@
                     <div class="card-header bg-white fw-bold"><i class="bi bi-text-paragraph me-2"></i>매물 설명</div>
                     <div class="card-body p-0">
                         <div id="editor-container"></div>
-                        <textarea name="description" id="id_description" style="display:none;">{{ form.description.value|default:"" }}</textarea>
+                        <textarea name="description" id="id_description" style="display:none;">{% if form.description.value %}{{ form.description.value }}{% endif %}</textarea>
                     </div>
                 </div>
 
@@ -193,9 +193,15 @@
         }
     }
 
-    // Sync Quill to textarea on form submit
+    // Sync Quill to textarea on every change + before submit
+    const descTextarea = document.getElementById('id_description');
+    quill.on('text-change', function() {
+        const html = quill.root.innerHTML;
+        descTextarea.value = (html === '<p><br></p>') ? '' : html;
+    });
     document.querySelector('form').addEventListener('submit', function() {
-        document.getElementById('id_description').value = quill.root.innerHTML;
+        const html = quill.root.innerHTML;
+        descTextarea.value = (html === '<p><br></p>') ? '' : html;
     });
 
     // Trade type toggle
