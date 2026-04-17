@@ -26,6 +26,11 @@
                 <li class="nav-item"><a class="nav-link" href="{% url 'listings:list' %}">매물 목록</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'listings:map' %}">지도 보기</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'listings:notice_list' %}">공지사항</a></li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="sharePage(); return false;" title="공유하기">
+                        <i class="bi bi-share"></i><span class="d-lg-none ms-1">공유하기</span>
+                    </a>
+                </li>
             </ul>
             <ul class="navbar-nav">
                 {% if user.is_authenticated %}
@@ -72,7 +77,29 @@
 
 {% block content %}{% endblock %}
 
+<!-- Share Toast -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1070;">
+    <div id="pageShareToast" class="toast align-items-center text-bg-success border-0" role="alert">
+        <div class="d-flex">
+            <div class="toast-body"><i class="bi bi-check-circle me-2"></i>링크가 복사되었습니다.</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function sharePage() {
+    if (navigator.share) {
+        navigator.share({ title: document.title, url: window.location.href });
+    } else {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            const toast = new bootstrap.Toast(document.getElementById('pageShareToast'));
+            toast.show();
+        });
+    }
+}
+</script>
 {% block extra_js %}{% endblock %}
 </body>
 </html>
