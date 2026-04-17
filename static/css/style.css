@@ -52,7 +52,6 @@ body {
 
 /* ========== Mobile Bottom Nav ========== */
 .mobile-bottom-nav {
-    display: none;
     position: fixed;
     bottom: 0;
     left: 0;
@@ -129,8 +128,7 @@ body {
     .my-listings-table .td-actions .d-flex { justify-content: flex-end; }
     .mobile-status { display: inline-block !important; }
 
-    /* Bottom nav show */
-    .mobile-bottom-nav { display: flex; }
+    /* Bottom nav padding */
     body { padding-bottom: 64px; }
 
     /* Hide desktop nav items on mobile */
