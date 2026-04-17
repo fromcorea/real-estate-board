@@ -18,7 +18,11 @@
         <a class="navbar-brand fw-bold" href="{% url 'home' %}">
             <i class="bi bi-house-door-fill me-1"></i>집구하자
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <div class="d-flex align-items-center gap-2 ms-auto d-lg-none">
+            <a class="text-white" href="#" onclick="sharePage(); return false;" title="공유"><i class="bi bi-share"></i></a>
+            <a class="text-white" href="{% url 'listings:create' %}"><i class="bi bi-plus-circle"></i></a>
+        </div>
+        <button class="navbar-toggler ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
@@ -26,31 +30,32 @@
                 <li class="nav-item"><a class="nav-link" href="{% url 'listings:list' %}">매물 목록</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'listings:map' %}">지도 보기</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'listings:notice_list' %}">공지사항</a></li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" onclick="sharePage(); return false;" title="공유하기">
-                        <i class="bi bi-share"></i><span class="d-lg-none ms-1">공유하기</span>
-                    </a>
-                </li>
             </ul>
-            <ul class="navbar-nav">
+            <ul class="navbar-nav align-items-lg-center">
+                <li class="nav-item d-none d-lg-block">
+                    <a class="nav-link" href="#" onclick="sharePage(); return false;" title="공유하기"><i class="bi bi-share"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'listings:create' %}"><i class="bi bi-plus-circle me-1"></i>매물 등록</a>
+                </li>
                 {% if user.is_authenticated %}
-                <li class="nav-item"><a class="nav-link" href="{% url 'listings:create' %}"><i class="bi bi-plus-circle me-1"></i>매물 등록</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'listings:my_listings' %}">내 매물</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'listings:bookmarks' %}"><i class="bi bi-heart me-1"></i>북마크</a></li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                         <i class="bi bi-person-circle me-1"></i>{{ user.name|default:user.username }}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">프로필</a></li>
+                        <li><a class="dropdown-item" href="{% url 'listings:my_listings' %}"><i class="bi bi-house-door me-2"></i>내 매물</a></li>
+                        <li><a class="dropdown-item" href="{% url 'listings:bookmarks' %}"><i class="bi bi-heart me-2"></i>북마크</a></li>
+                        <li><a class="dropdown-item" href="{% url 'accounts:profile' %}"><i class="bi bi-person me-2"></i>프로필</a></li>
                         {% if user.is_staff %}
-                        <li><a class="dropdown-item" href="{% url 'admin:index' %}">관리자</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'admin:index' %}"><i class="bi bi-gear me-2"></i>관리자</a></li>
                         {% endif %}
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <form method="post" action="{% url 'accounts:logout' %}">
                                 {% csrf_token %}
-                                <button class="dropdown-item" type="submit">로그아웃</button>
+                                <button class="dropdown-item" type="submit"><i class="bi bi-box-arrow-right me-2"></i>로그아웃</button>
                             </form>
                         </li>
                     </ul>
