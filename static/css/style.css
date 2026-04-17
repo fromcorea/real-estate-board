@@ -59,9 +59,7 @@ body {
 
 @media (max-width: 768px) {
     /* Hero */
-    .hero-section { padding: 40px 0; }
-    .hero-section h1 { font-size: 1.5rem; }
-    .hero-section .lead { font-size: 0.9rem; }
+    .hero-section { padding: 16px 0; }
     .hero-section .input-group-lg .form-control,
     .hero-section .input-group-lg .form-select,
     .hero-section .input-group-lg .btn { font-size: 0.9rem; }

@@ -4,8 +4,8 @@
 {% block content %}
 <section class="hero-section text-center text-white">
     <div class="container">
-        <h1 class="display-4 fw-bold mb-3">내 집을 찾는 가장 쉬운 방법</h1>
-        <p class="lead mb-4">전국 부동산 매물을 한눈에 검색하고, 직접 등록하세요.</p>
+        <h1 class="display-4 fw-bold mb-3 d-none d-md-block">내 집을 찾는 가장 쉬운 방법</h1>
+        <p class="lead mb-4 d-none d-md-block">전국 부동산 매물을 한눈에 검색하고, 직접 등록하세요.</p>
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <form method="get" action="{% url 'listings:list' %}">
