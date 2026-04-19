@@ -127,6 +127,8 @@ class PropertyCreateView(CreateView):
     def form_valid(self, form):
         if self.request.user.is_authenticated:
             form.instance.author = self.request.user
+        else:
+            form.instance.author = None
         self.object = form.save()
         image_formset = PropertyImageFormSet(self.request.POST, self.request.FILES, instance=self.object)
         if image_formset.is_valid():
