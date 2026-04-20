@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}{{ post.title }} - 매물공유 - 집구하자{% endblock %}
+
+{% block content %}
+<div class="container py-3 py-md-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-body">
+                    <div class="mb-2">
+                        <span class="badge bg-secondary">{{ post.get_category_display }}</span>
+                    </div>
+                    <h4 class="fw-bold mb-2">{{ post.title }}</h4>
+                    <div class="d-flex flex-wrap gap-3 text-muted small border-bottom pb-2">
+                        <span><i class="bi bi-person me-1"></i>{{ post.writer_name }}</span>
+                        <span><i class="bi bi-clock me-1"></i>{{ post.created_at|date:"Y.m.d H:i" }}</span>
+                        <span><i class="bi bi-eye me-1"></i>조회 {{ post.view_count }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-body" style="min-height:200px; line-height:1.8;">
+                    {{ post.content|safe }}
+                </div>
+            </div>
+
+            <!-- File -->
+            {% if post.file1 %}
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-2"><i class="bi bi-paperclip me-1"></i>첨부파일</h6>
+                    <a href="{{ post.file1.url }}" target="_blank" class="text-decoration-none">
+                        <i class="bi bi-download me-1"></i>{{ post.file1.name|cut:"board/" }}
+                    </a>
+                    {% with ext=post.file1.name|lower %}
+                    {% if '.jpg' in ext or '.jpeg' in ext or '.png' in ext or '.gif' in ext or '.webp' in ext %}
+                    <div class="mt-2">
+                        <img src="{{ post.file1.url }}" class="img-fluid rounded" style="max-width:100%;" alt="첨부 이미지">
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Actions -->
+            <div class="d-flex gap-2 justify-content-between">
+                <a href="{% url 'listings:board_list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-list me-1"></i>목록
+                </a>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'listings:board_edit' post.pk %}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-pencil me-1"></i>수정
+                    </a>
+                    <a href="{% url 'listings:board_delete' post.pk %}" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-trash me-1"></i>삭제
+                    </a>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="sharePage()">
+                        <i class="bi bi-share me-1"></i>공유
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

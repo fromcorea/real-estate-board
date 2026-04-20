@@ -179,6 +179,41 @@ class Report(models.Model):
         return f"[{self.get_reason_display()}] {self.property.title}"
 
 
+def board_file_path(instance, filename):
+    ext = filename.rsplit('.', 1)[-1] if '.' in filename else 'jpg'
+    return f'board/{uuid.uuid4().hex}.{ext}'
+
+
+class BoardPost(models.Model):
+    CATEGORY_CHOICES = Property.PROPERTY_TYPE_CHOICES
+
+    category = models.CharField('분류', max_length=20, choices=CATEGORY_CHOICES)
+    writer_name = models.CharField('작성자', max_length=30)
+    password = models.CharField('비밀번호', max_length=128)
+    title = models.CharField('제목', max_length=200)
+    content = models.TextField('글내용')
+    file1 = models.FileField('파일첨부', upload_to=board_file_path, blank=True)
+    view_count = models.PositiveIntegerField('조회수', default=0)
+    created_at = models.DateTimeField('등록일', auto_now_add=True)
+    updated_at = models.DateTimeField('수정일', auto_now=True)
+
+    class Meta:
+        verbose_name = '매물 게시판'
+        verbose_name_plural = '매물 게시판'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.title
+
+    def set_password(self, raw_password):
+        from django.contrib.auth.hashers import make_password
+        self.password = make_password(raw_password)
+
+    def check_password(self, raw_password):
+        from django.contrib.auth.hashers import check_password
+        return check_password(raw_password, self.password)
+
+
 class Notice(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
                                verbose_name='작성자')

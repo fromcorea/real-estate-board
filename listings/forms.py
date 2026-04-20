@@ -1,5 +1,5 @@
 from django import forms
-from .models import Property, PropertyImage, Report
+from .models import Property, PropertyImage, Report, BoardPost
 
 
 class PropertyForm(forms.ModelForm):
@@ -49,3 +49,31 @@ class ReportForm(forms.ModelForm):
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4, 'placeholder': '신고 사유를 자세히 적어주세요.'}),
         }
+
+
+class BoardPostForm(forms.ModelForm):
+    raw_password = forms.CharField(
+        label='비밀번호', max_length=30,
+        widget=forms.PasswordInput(attrs={'placeholder': '수정/삭제 시 필요합니다'}),
+    )
+
+    class Meta:
+        model = BoardPost
+        fields = ['category', 'writer_name', 'title', 'content', 'file1']
+        widgets = {
+            'content': forms.Textarea(attrs={'id': 'id_board_content'}),
+        }
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.set_password(self.cleaned_data['raw_password'])
+        if commit:
+            instance.save()
+        return instance
+
+
+class BoardPasswordForm(forms.Form):
+    password = forms.CharField(
+        label='비밀번호', max_length=30,
+        widget=forms.PasswordInput(attrs={'placeholder': '게시글 비밀번호를 입력하세요'}),
+    )

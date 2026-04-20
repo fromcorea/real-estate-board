@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Property, PropertyImage, Bookmark, Report, Notice
+from .models import Property, PropertyImage, Bookmark, Report, Notice, BoardPost
 
 
 class PropertyImageInline(admin.TabularInline):
@@ -66,3 +66,10 @@ class NoticeAdmin(admin.ModelAdmin):
         if not change:
             obj.author = request.user
         super().save_model(request, obj, form, change)
+
+
+@admin.register(BoardPost)
+class BoardPostAdmin(admin.ModelAdmin):
+    list_display = ['title', 'category', 'writer_name', 'view_count', 'created_at']
+    list_filter = ['category']
+    search_fields = ['title', 'writer_name', 'content']

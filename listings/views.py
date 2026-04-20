@@ -1,13 +1,15 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Q
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 
-from .forms import PropertyForm, PropertyImageFormSet, ReportForm
-from .models import Property, Bookmark, Notice
+from django.contrib import messages
+
+from .forms import PropertyForm, PropertyImageFormSet, ReportForm, BoardPostForm, BoardPasswordForm
+from .models import Property, Bookmark, Notice, BoardPost
 
 
 class HomeView(TemplateView):
@@ -260,3 +262,109 @@ class NoticeDetailView(DetailView):
     model = Notice
     template_name = 'listings/notice_detail.html'
     context_object_name = 'notice'
+
+
+# ===== Board (게시판형 매물 공유) =====
+
+class BoardListView(ListView):
+    model = BoardPost
+    template_name = 'listings/board_list.html'
+    context_object_name = 'posts'
+    paginate_by = 20
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        category = self.request.GET.get('category')
+        if category:
+            qs = qs.filter(category=category)
+        keyword = self.request.GET.get('keyword', '').strip()
+        if keyword:
+            qs = qs.filter(Q(title__icontains=keyword) | Q(content__icontains=keyword))
+        return qs
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['categories'] = BoardPost.CATEGORY_CHOICES
+        ctx['params'] = self.request.GET
+        return ctx
+
+
+class BoardDetailView(DetailView):
+    model = BoardPost
+    template_name = 'listings/board_detail.html'
+    context_object_name = 'post'
+
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        BoardPost.objects.filter(pk=self.object.pk).update(view_count=self.object.view_count + 1)
+        return response
+
+
+class BoardCreateView(CreateView):
+    model = BoardPost
+    form_class = BoardPostForm
+    template_name = 'listings/board_form.html'
+
+    def get_success_url(self):
+        return reverse_lazy('listings:board_detail', kwargs={'pk': self.object.pk})
+
+
+class BoardEditView(View):
+    def get(self, request, pk):
+        post = get_object_or_404(BoardPost, pk=pk)
+        password_form = BoardPasswordForm()
+        return render(request, 'listings/board_password.html', {
+            'post': post, 'password_form': password_form, 'action': 'edit'
+        })
+
+    def post(self, request, pk):
+        post = get_object_or_404(BoardPost, pk=pk)
+        password_form = BoardPasswordForm(request.POST)
+        if password_form.is_valid():
+            if post.check_password(password_form.cleaned_data['password']):
+                form = BoardPostForm(instance=post)
+                form.fields.pop('raw_password')
+                return render(request, 'listings/board_form.html', {
+                    'form': form, 'object': post, 'edit_mode': True
+                })
+            else:
+                messages.error(request, '비밀번호가 일치하지 않습니다.')
+        return render(request, 'listings/board_password.html', {
+            'post': post, 'password_form': password_form, 'action': 'edit'
+        })
+
+
+class BoardUpdateView(View):
+    def post(self, request, pk):
+        post = get_object_or_404(BoardPost, pk=pk)
+        post.category = request.POST.get('category', post.category)
+        post.writer_name = request.POST.get('writer_name', post.writer_name)
+        post.title = request.POST.get('title', post.title)
+        post.content = request.POST.get('content', post.content)
+        if request.FILES.get('file1'):
+            post.file1 = request.FILES['file1']
+        post.save()
+        return redirect('listings:board_detail', pk=post.pk)
+
+
+class BoardDeleteView(View):
+    def get(self, request, pk):
+        post = get_object_or_404(BoardPost, pk=pk)
+        password_form = BoardPasswordForm()
+        return render(request, 'listings/board_password.html', {
+            'post': post, 'password_form': password_form, 'action': 'delete'
+        })
+
+    def post(self, request, pk):
+        post = get_object_or_404(BoardPost, pk=pk)
+        password_form = BoardPasswordForm(request.POST)
+        if password_form.is_valid():
+            if post.check_password(password_form.cleaned_data['password']):
+                post.delete()
+                messages.success(request, '게시글이 삭제되었습니다.')
+                return redirect('listings:board_list')
+            else:
+                messages.error(request, '비밀번호가 일치하지 않습니다.')
+        return render(request, 'listings/board_password.html', {
+            'post': post, 'password_form': password_form, 'action': 'delete'
+        })

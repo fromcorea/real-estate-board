@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block title %}매물공유 게시판 - 집구하자{% endblock %}
+
+{% block content %}
+<div class="container py-3 py-md-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold mb-0">매물공유 게시판</h4>
+        <a href="{% url 'listings:board_create' %}" class="btn btn-primary btn-sm">
+            <i class="bi bi-pencil-square me-1"></i>글쓰기
+        </a>
+    </div>
+
+    <!-- Search & Filter -->
+    <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body py-2">
+            <form method="get" class="d-flex flex-wrap gap-2 align-items-center">
+                <select name="category" class="form-select form-select-sm" style="width:auto;">
+                    <option value="">전체분류</option>
+                    {% for value, label in categories %}
+                    <option value="{{ value }}" {% if params.category == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <div class="input-group input-group-sm flex-grow-1" style="min-width:200px;">
+                    <input type="text" name="keyword" class="form-control" placeholder="제목, 내용 검색" value="{{ params.keyword|default:'' }}">
+                    <button class="btn btn-outline-primary" type="submit"><i class="bi bi-search"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Board Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th class="text-center" style="width:50px;">번호</th>
+                        <th class="text-center" style="width:100px;">분류</th>
+                        <th>제목</th>
+                        <th class="text-center" style="width:90px;">작성자</th>
+                        <th class="text-center d-none d-md-table-cell" style="width:100px;">등록일</th>
+                        <th class="text-center d-none d-md-table-cell" style="width:60px;">조회</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for post in posts %}
+                    <tr>
+                        <td class="text-center text-muted small">{{ post.pk }}</td>
+                        <td class="text-center"><span class="badge bg-secondary">{{ post.get_category_display }}</span></td>
+                        <td>
+                            <a href="{% url 'listings:board_detail' post.pk %}" class="text-decoration-none text-dark">
+                                {{ post.title }}
+                                {% if post.file1 %}<i class="bi bi-paperclip text-muted ms-1"></i>{% endif %}
+                            </a>
+                            <span class="d-md-none text-muted small d-block">{{ post.writer_name }} | {{ post.created_at|date:"m.d" }}</span>
+                        </td>
+                        <td class="text-center small">{{ post.writer_name }}</td>
+                        <td class="text-center small text-muted d-none d-md-table-cell">{{ post.created_at|date:"Y.m.d" }}</td>
+                        <td class="text-center small text-muted d-none d-md-table-cell">{{ post.view_count }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <i class="bi bi-inbox display-4 text-muted"></i>
+                            <p class="text-muted mt-3">등록된 게시글이 없습니다.</p>
+                            <a href="{% url 'listings:board_create' %}" class="btn btn-primary mt-2">첫 글 작성하기</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <nav class="mt-3">
+        <ul class="pagination pagination-sm justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?{% for k,v in params.items %}{% if k != 'page' %}{{ k }}={{ v }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">이전</a></li>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+            <li class="page-item"><a class="page-link" href="?{% for k,v in params.items %}{% if k != 'page' %}{{ k }}={{ v }}&{% endif %}{% endfor %}page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?{% for k,v in params.items %}{% if k != 'page' %}{{ k }}={{ v }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">다음</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

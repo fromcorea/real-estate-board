@@ -17,4 +17,11 @@ urlpatterns = [
     path('<int:pk>/report/', views.ReportCreateView.as_view(), name='report'),
     path('notices/', views.NoticeListView.as_view(), name='notice_list'),
     path('notices/<int:pk>/', views.NoticeDetailView.as_view(), name='notice_detail'),
+    # Board (게시판형)
+    path('board/', views.BoardListView.as_view(), name='board_list'),
+    path('board/write/', views.BoardCreateView.as_view(), name='board_create'),
+    path('board/<int:pk>/', views.BoardDetailView.as_view(), name='board_detail'),
+    path('board/<int:pk>/edit/', views.BoardEditView.as_view(), name='board_edit'),
+    path('board/<int:pk>/update/', views.BoardUpdateView.as_view(), name='board_update'),
+    path('board/<int:pk>/delete/', views.BoardDeleteView.as_view(), name='board_delete'),
 ]
