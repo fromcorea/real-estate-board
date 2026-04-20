@@ -87,22 +87,30 @@ class Property(models.Model):
 
     @property
     def price_display(self):
-        if self.trade_type == 'monthly':
-            return f"월세 {self.deposit:,}/{self.monthly_rent:,}만"
-        elif self.trade_type == 'jeonse':
-            return f"전세 {self.price:,}만"
-        else:
-            if self.price >= 10000:
-                억 = self.price // 10000
-                만 = self.price % 10000
-                if 만:
-                    return f"매매 {억}억 {만:,}만"
-                return f"매매 {억}억"
-            return f"매매 {self.price:,}만"
+        try:
+            if self.trade_type == 'monthly':
+                dep = self.deposit or 0
+                rent = self.monthly_rent or 0
+                return f"월세 {dep:,}/{rent:,}만"
+            elif self.trade_type == 'jeonse':
+                return f"전세 {self.price:,}만"
+            else:
+                if self.price and self.price >= 10000:
+                    억 = self.price // 10000
+                    만 = self.price % 10000
+                    if 만:
+                        return f"매매 {억}억 {만:,}만"
+                    return f"매매 {억}억"
+                return f"매매 {self.price:,}만" if self.price else ""
+        except (TypeError, ValueError):
+            return ""
 
     @property
     def area_pyeong(self):
-        return round(float(self.area) * 0.3025, 1)
+        try:
+            return round(float(self.area) * 0.3025, 1)
+        except (TypeError, ValueError):
+            return 0
 
     @property
     def thumbnail(self):
