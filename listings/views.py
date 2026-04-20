@@ -320,8 +320,11 @@ class BoardCreateView(CreateView):
 
     def form_valid(self, form):
         self.object = form.save()
-        for f in self.request.FILES.getlist('files'):
-            BoardFile.objects.create(post=self.object, file=f, original_name=f.name)
+        file_formset = BoardFileFormSet(self.request.POST, self.request.FILES, instance=self.object)
+        if file_formset.is_valid():
+            for f in file_formset.save(commit=False):
+                f.original_name = f.file.name
+                f.save()
         return redirect('listings:board_detail', pk=self.object.pk)
 
 

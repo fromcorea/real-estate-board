@@ -54,34 +54,33 @@
                     <tr>
                         <th class="table-light">파일첨부</th>
                         <td>
-                            {% if file_formset %}
                             {{ file_formset.management_form }}
-                            {% for ff in file_formset %}
-                            <div class="mb-2 d-flex align-items-center gap-2">
-                                {% for field in ff.hidden_fields %}{{ field }}{% endfor %}
-                                {% if ff.instance.pk and ff.instance.file %}
-                                <small class="text-muted">{{ ff.instance.original_name }}</small>
-                                {% for field in ff.visible_fields %}
-                                    {% if field.name == 'DELETE' %}
-                                    <div class="form-check">{{ field }} <label class="form-check-label small text-danger" for="{{ field.id_for_label }}">삭제</label></div>
-                                    {% elif field.name == 'file' %}
+                            <div id="file-list">
+                                {% for ff in file_formset %}
+                                <div class="file-row d-flex align-items-center gap-2 mb-2">
+                                    {% for field in ff.hidden_fields %}{{ field }}{% endfor %}
+                                    {% if ff.instance.pk and ff.instance.file %}
+                                    <span class="small text-muted flex-grow-1"><i class="bi bi-paperclip me-1"></i>{{ ff.instance.original_name }}</span>
+                                    {% for field in ff.visible_fields %}
+                                        {% if field.name == 'DELETE' %}
+                                        <div class="form-check">{{ field }} <label class="form-check-label small text-danger" for="{{ field.id_for_label }}">삭제</label></div>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% else %}
+                                    {% for field in ff.visible_fields %}
+                                        {% if field.name == 'file' %}
+                                        <div class="flex-grow-1">{{ field|add_class:"form-control form-control-sm" }}</div>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <button type="button" class="btn btn-sm btn-outline-danger remove-file-btn" title="제거"><i class="bi bi-x-lg"></i></button>
                                     {% endif %}
+                                </div>
                                 {% endfor %}
-                                {% else %}
-                                {% for field in ff.visible_fields %}
-                                    {% if field.name == 'file' %}
-                                    {{ field|add_class:"form-control form-control-sm" }}
-                                    {% elif field.name == 'DELETE' %}
-                                    {% endif %}
-                                {% endfor %}
-                                {% endif %}
                             </div>
-                            {% endfor %}
-                            {% else %}
-                            <!-- 신규 등록: 단순 다중 파일 -->
-                            <input type="file" name="files" class="form-control form-control-sm" multiple>
-                            {% endif %}
-                            <small class="text-muted">최대 10개까지 첨부 가능합니다.</small>
+                            <button type="button" class="btn btn-sm btn-outline-success mt-1" id="add-file-btn">
+                                <i class="bi bi-plus me-1"></i>첨부파일 더 추가하기
+                            </button>
+                            <br><small class="text-muted">최대 10개까지 첨부 가능합니다.</small>
                         </td>
                     </tr>
                     {% if form.raw_password and not edit_mode %}
@@ -128,6 +127,37 @@ tinymce.init({
             reader.onloadend = function() { resolve(reader.result); };
             reader.readAsDataURL(blobInfo.blob());
         });
+    }
+});
+
+// Dynamic file formset
+const fileList = document.getElementById('file-list');
+const addBtn = document.getElementById('add-file-btn');
+const totalForms = document.getElementById('id_files-TOTAL_FORMS');
+
+addBtn.addEventListener('click', function() {
+    const count = parseInt(totalForms.value);
+    if (count >= 10) { alert('최대 10개까지 첨부 가능합니다.'); return; }
+    const row = document.createElement('div');
+    row.className = 'file-row d-flex align-items-center gap-2 mb-2';
+    row.innerHTML = `
+        <div class="flex-grow-1">
+            <input type="file" name="files-${count}-file" id="id_files-${count}-file" class="form-control form-control-sm">
+            <input type="hidden" name="files-${count}-id" id="id_files-${count}-id">
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-danger remove-file-btn" title="제거"><i class="bi bi-x-lg"></i></button>
+    `;
+    fileList.appendChild(row);
+    totalForms.value = count + 1;
+});
+
+fileList.addEventListener('click', function(e) {
+    const btn = e.target.closest('.remove-file-btn');
+    if (btn) {
+        const row = btn.closest('.file-row');
+        const fileInput = row.querySelector('input[type="file"]');
+        if (fileInput) { fileInput.value = ''; }
+        row.style.display = 'none';
     }
 });
 </script>
