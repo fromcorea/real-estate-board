@@ -187,9 +187,11 @@ def board_file_path(instance, filename):
 class BoardPost(models.Model):
     CATEGORY_CHOICES = Property.PROPERTY_TYPE_CHOICES
 
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
+                               null=True, blank=True, related_name='board_posts', verbose_name='회원')
     category = models.CharField('분류', max_length=20, choices=CATEGORY_CHOICES)
     writer_name = models.CharField('작성자', max_length=30)
-    password = models.CharField('비밀번호', max_length=128)
+    password = models.CharField('비밀번호', max_length=128, blank=True)
     title = models.CharField('제목', max_length=200)
     content = models.TextField('글내용')
     file1 = models.FileField('파일첨부', upload_to=board_file_path, blank=True)

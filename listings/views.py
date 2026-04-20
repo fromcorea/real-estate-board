@@ -305,13 +305,28 @@ class BoardCreateView(CreateView):
     form_class = BoardPostForm
     template_name = 'listings/board_form.html'
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
     def get_success_url(self):
         return reverse_lazy('listings:board_detail', kwargs={'pk': self.object.pk})
+
+
+def _can_edit_post(user, post):
+    """로그인 사용자가 본인 글인지 확인"""
+    return user.is_authenticated and post.author and post.author == user
 
 
 class BoardEditView(View):
     def get(self, request, pk):
         post = get_object_or_404(BoardPost, pk=pk)
+        if _can_edit_post(request.user, post):
+            form = BoardPostForm(instance=post, user=request.user)
+            return render(request, 'listings/board_form.html', {
+                'form': form, 'object': post, 'edit_mode': True
+            })
         password_form = BoardPasswordForm()
         return render(request, 'listings/board_password.html', {
             'post': post, 'password_form': password_form, 'action': 'edit'
@@ -319,11 +334,16 @@ class BoardEditView(View):
 
     def post(self, request, pk):
         post = get_object_or_404(BoardPost, pk=pk)
+        if _can_edit_post(request.user, post):
+            form = BoardPostForm(instance=post, user=request.user)
+            return render(request, 'listings/board_form.html', {
+                'form': form, 'object': post, 'edit_mode': True
+            })
         password_form = BoardPasswordForm(request.POST)
         if password_form.is_valid():
             if post.check_password(password_form.cleaned_data['password']):
                 form = BoardPostForm(instance=post)
-                form.fields.pop('raw_password')
+                form.fields.pop('raw_password', None)
                 return render(request, 'listings/board_form.html', {
                     'form': form, 'object': post, 'edit_mode': True
                 })
@@ -338,7 +358,8 @@ class BoardUpdateView(View):
     def post(self, request, pk):
         post = get_object_or_404(BoardPost, pk=pk)
         post.category = request.POST.get('category', post.category)
-        post.writer_name = request.POST.get('writer_name', post.writer_name)
+        if not post.author:
+            post.writer_name = request.POST.get('writer_name', post.writer_name)
         post.title = request.POST.get('title', post.title)
         post.content = request.POST.get('content', post.content)
         if request.FILES.get('file1'):
@@ -350,6 +371,10 @@ class BoardUpdateView(View):
 class BoardDeleteView(View):
     def get(self, request, pk):
         post = get_object_or_404(BoardPost, pk=pk)
+        if _can_edit_post(request.user, post):
+            return render(request, 'listings/board_password.html', {
+                'post': post, 'action': 'delete', 'skip_password': True
+            })
         password_form = BoardPasswordForm()
         return render(request, 'listings/board_password.html', {
             'post': post, 'password_form': password_form, 'action': 'delete'
@@ -357,6 +382,10 @@ class BoardDeleteView(View):
 
     def post(self, request, pk):
         post = get_object_or_404(BoardPost, pk=pk)
+        if _can_edit_post(request.user, post):
+            post.delete()
+            messages.success(request, '게시글이 삭제되었습니다.')
+            return redirect('listings:board_list')
         password_form = BoardPasswordForm(request.POST)
         if password_form.is_valid():
             if post.check_password(password_form.cleaned_data['password']):

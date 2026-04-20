@@ -32,11 +32,13 @@
                         <th class="table-light" style="width:120px;">분류 <span class="text-danger">*</span></th>
                         <td>{{ form.category|add_class:"form-select form-select-sm" }}</td>
                     </tr>
-                    {% if not edit_mode %}
+                    {% if not form.writer_name.is_hidden %}
                     <tr>
                         <th class="table-light">작성자 <span class="text-danger">*</span></th>
                         <td>{{ form.writer_name|add_class:"form-control form-control-sm"|attr:"style:max-width:200px" }}</td>
                     </tr>
+                    {% else %}
+                    {{ form.writer_name }}
                     {% endif %}
                     <tr>
                         <th class="table-light">제목 <span class="text-danger">*</span></th>
@@ -59,7 +61,7 @@
                             <small class="text-danger">* 사진은 가로 300픽셀 이하로 줄여서 올려 주시기 바랍니다.</small>
                         </td>
                     </tr>
-                    {% if not edit_mode %}
+                    {% if form.raw_password and not edit_mode %}
                     <tr>
                         <th class="table-light">비밀번호 <span class="text-danger">*</span></th>
                         <td>

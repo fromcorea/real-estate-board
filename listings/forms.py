@@ -53,7 +53,7 @@ class ReportForm(forms.ModelForm):
 
 class BoardPostForm(forms.ModelForm):
     raw_password = forms.CharField(
-        label='비밀번호', max_length=30,
+        label='비밀번호', max_length=30, required=False,
         widget=forms.PasswordInput(attrs={'placeholder': '수정/삭제 시 필요합니다'}),
     )
 
@@ -64,9 +64,24 @@ class BoardPostForm(forms.ModelForm):
             'content': forms.Textarea(attrs={'id': 'id_board_content'}),
         }
 
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+        if user and user.is_authenticated:
+            self.fields['writer_name'].required = False
+            self.fields['writer_name'].widget = forms.HiddenInput()
+            self.fields.pop('raw_password', None)
+
     def save(self, commit=True):
         instance = super().save(commit=False)
-        instance.set_password(self.cleaned_data['raw_password'])
+        if self.user and self.user.is_authenticated:
+            instance.author = self.user
+            instance.writer_name = self.user.name or self.user.username
+            instance.password = ''
+        else:
+            raw_pw = self.cleaned_data.get('raw_password', '')
+            if raw_pw:
+                instance.set_password(raw_pw)
         if commit:
             instance.save()
         return instance
