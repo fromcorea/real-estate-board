@@ -3,7 +3,7 @@
 {% block title %}{% if object %}글 수정{% else %}글 작성{% endif %} - 매물공유 - 집구하자{% endblock %}
 
 {% block extra_css %}
-<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs5.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.css" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -108,25 +108,27 @@
 
 {% block extra_js %}
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/lang/summernote-ko-KR.min.js"></script>
 <script>
-$('#id_board_content').summernote({
-    height: 350,
-    lang: 'ko-KR',
-    toolbar: [
-        ['style', ['style']],
-        ['font', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
-        ['fontname', ['fontname']],
-        ['fontsize', ['fontsize']],
-        ['color', ['color']],
-        ['para', ['ul', 'ol', 'paragraph']],
-        ['table', ['table']],
-        ['insert', ['link', 'picture', 'video', 'hr']],
-        ['view', ['fullscreen', 'codeview', 'help']]
-    ],
-    fontNames: ['맑은 고딕', '굴림', '돋움', '바탕', 'Arial', 'Times New Roman'],
-    fontSizes: ['8','9','10','11','12','14','16','18','20','24','28','36'],
+$(document).ready(function() {
+    $('#id_board_content').summernote({
+        height: 350,
+        lang: 'ko-KR',
+        toolbar: [
+            ['style', ['style']],
+            ['font', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
+            ['fontname', ['fontname']],
+            ['fontsize', ['fontsize']],
+            ['color', ['forecolor', 'backcolor']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['table', ['table']],
+            ['insert', ['link', 'picture', 'video', 'hr']],
+            ['view', ['fullscreen', 'codeview', 'help']]
+        ],
+        fontNames: ['맑은 고딕', '굴림', '돋움', '바탕', 'Arial', 'Times New Roman'],
+        fontSizes: ['8','9','10','11','12','14','16','18','20','24','28','36'],
+    });
 });
 
 // Dynamic file formset

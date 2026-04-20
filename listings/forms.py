@@ -68,7 +68,7 @@ class BoardPostForm(forms.ModelForm):
     def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = user
-        self.fields['category'].empty_label = '분류'
+        self.fields['category'].choices = [('', '분류')] + list(BoardPost.CATEGORY_CHOICES)
         if user and user.is_authenticated:
             self.fields['writer_name'].required = False
             self.fields['writer_name'].widget = forms.HiddenInput()
@@ -98,7 +98,7 @@ class BoardFileForm(forms.ModelForm):
 BoardFileFormSet = forms.inlineformset_factory(
     BoardPost, BoardFile,
     form=BoardFileForm,
-    extra=3,
+    extra=1,
     max_num=10,
     can_delete=True,
 )
