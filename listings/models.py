@@ -12,11 +12,14 @@ def property_image_path(instance, filename):
 class Property(models.Model):
     PROPERTY_TYPE_CHOICES = [
         ('apartment', '아파트'),
-        ('villa', '빌라'),
-        ('officetel', '오피스텔'),
-        ('oneroom', '원룸'),
-        ('store', '상가'),
-        ('land', '토지'),
+        ('house', '단독/다가구'),
+        ('villa', '연립/빌라'),
+        ('oneroom', '방한칸'),
+        ('office', '사무실/오피스텔'),
+        ('restaurant', '요식업/영업점'),
+        ('store', '상가점포/빌딩'),
+        ('land', '대지/임야'),
+        ('factory', '공장/창고/기타'),
     ]
     TRADE_TYPE_CHOICES = [
         ('sale', '매매'),

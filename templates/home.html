@@ -44,10 +44,10 @@
     <div class="container">
         <div class="row text-center g-3">
             {% for value, label in property_types %}
-            <div class="col-4 col-md-2">
+            <div class="col-4 col-md">
                 <a href="{% url 'listings:list' %}?property_type={{ value }}" class="text-decoration-none">
                     <div class="category-card p-4 rounded-3 bg-white shadow-sm">
-                        <i class="bi bi-{% if value == 'apartment' %}building{% elif value == 'villa' %}houses{% elif value == 'officetel' %}hospital{% elif value == 'oneroom' %}door-open{% elif value == 'store' %}shop{% else %}tree{% endif %} display-4 text-primary"></i>
+                        <i class="bi bi-{% if value == 'apartment' %}building{% elif value == 'house' %}house-door{% elif value == 'villa' %}houses{% elif value == 'oneroom' %}door-open{% elif value == 'office' %}briefcase{% elif value == 'restaurant' %}cup-hot{% elif value == 'store' %}shop{% elif value == 'land' %}tree{% elif value == 'factory' %}gear-wide-connected{% else %}grid{% endif %} display-4 text-primary"></i>
                         <p class="mt-2 mb-0 fw-semibold text-dark">{{ label }}</p>
                     </div>
                 </a>
