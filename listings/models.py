@@ -194,7 +194,7 @@ class BoardPost(models.Model):
     password = models.CharField('비밀번호', max_length=128, blank=True)
     title = models.CharField('제목', max_length=200)
     content = models.TextField('글내용')
-    file1 = models.FileField('파일첨부', upload_to=board_file_path, blank=True)
+    file1 = models.FileField('파일첨부', upload_to=board_file_path, blank=True)  # legacy
     view_count = models.PositiveIntegerField('조회수', default=0)
     created_at = models.DateTimeField('등록일', auto_now_add=True)
     updated_at = models.DateTimeField('수정일', auto_now=True)
@@ -214,6 +214,27 @@ class BoardPost(models.Model):
     def check_password(self, raw_password):
         from django.contrib.auth.hashers import check_password
         return check_password(raw_password, self.password)
+
+
+class BoardFile(models.Model):
+    post = models.ForeignKey(BoardPost, on_delete=models.CASCADE,
+                             related_name='files', verbose_name='게시글')
+    file = models.FileField('파일', upload_to=board_file_path)
+    original_name = models.CharField('원본 파일명', max_length=255, blank=True)
+    created_at = models.DateTimeField('등록일', auto_now_add=True)
+
+    class Meta:
+        verbose_name = '게시판 첨부파일'
+        verbose_name_plural = '게시판 첨부파일'
+        ordering = ['created_at']
+
+    def __str__(self):
+        return self.original_name or str(self.file)
+
+    @property
+    def is_image(self):
+        name = (self.original_name or self.file.name).lower()
+        return any(name.endswith(ext) for ext in ['.jpg', '.jpeg', '.png', '.gif', '.webp'])
 
 
 class Notice(models.Model):

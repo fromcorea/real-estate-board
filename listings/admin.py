@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Property, PropertyImage, Bookmark, Report, Notice, BoardPost
+from .models import Property, PropertyImage, Bookmark, Report, Notice, BoardPost, BoardFile
 
 
 class PropertyImageInline(admin.TabularInline):
@@ -68,8 +68,15 @@ class NoticeAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
+class BoardFileInline(admin.TabularInline):
+    model = BoardFile
+    extra = 1
+    max_num = 10
+
+
 @admin.register(BoardPost)
 class BoardPostAdmin(admin.ModelAdmin):
     list_display = ['title', 'category', 'writer_name', 'view_count', 'created_at']
     list_filter = ['category']
     search_fields = ['title', 'writer_name', 'content']
+    inlines = [BoardFileInline]

@@ -27,7 +27,30 @@
                 </div>
             </div>
 
-            <!-- File -->
+            <!-- Files -->
+            {% with files=post.files.all %}
+            {% if files %}
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-2"><i class="bi bi-paperclip me-1"></i>첨부파일 ({{ files|length }}개)</h6>
+                    {% for file in files %}
+                    <div class="mb-2">
+                        <a href="{{ file.file.url }}" target="_blank" class="text-decoration-none">
+                            <i class="bi bi-download me-1"></i>{{ file.original_name }}
+                        </a>
+                        {% if file.is_image %}
+                        <div class="mt-1">
+                            <img src="{{ file.file.url }}" class="img-fluid rounded" style="max-width:100%; max-height:500px;" alt="{{ file.original_name }}">
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            <!-- Legacy file1 -->
             {% if post.file1 %}
             <div class="card border-0 shadow-sm mb-3">
                 <div class="card-body">
@@ -35,13 +58,6 @@
                     <a href="{{ post.file1.url }}" target="_blank" class="text-decoration-none">
                         <i class="bi bi-download me-1"></i>{{ post.file1.name|cut:"board/" }}
                     </a>
-                    {% with ext=post.file1.name|lower %}
-                    {% if '.jpg' in ext or '.jpeg' in ext or '.png' in ext or '.gif' in ext or '.webp' in ext %}
-                    <div class="mt-2">
-                        <img src="{{ post.file1.url }}" class="img-fluid rounded" style="max-width:100%;" alt="첨부 이미지">
-                    </div>
-                    {% endif %}
-                    {% endwith %}
                 </div>
             </div>
             {% endif %}

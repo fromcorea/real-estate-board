@@ -8,8 +8,8 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 
 from django.contrib import messages
 
-from .forms import PropertyForm, PropertyImageFormSet, ReportForm, BoardPostForm, BoardPasswordForm
-from .models import Property, Bookmark, Notice, BoardPost
+from .forms import PropertyForm, PropertyImageFormSet, ReportForm, BoardPostForm, BoardFileFormSet, BoardPasswordForm
+from .models import Property, Bookmark, Notice, BoardPost, BoardFile
 
 
 class HomeView(TemplateView):
@@ -310,8 +310,19 @@ class BoardCreateView(CreateView):
         kwargs['user'] = self.request.user
         return kwargs
 
-    def get_success_url(self):
-        return reverse_lazy('listings:board_detail', kwargs={'pk': self.object.pk})
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        if self.request.POST:
+            ctx['file_formset'] = BoardFileFormSet(self.request.POST, self.request.FILES)
+        else:
+            ctx['file_formset'] = BoardFileFormSet()
+        return ctx
+
+    def form_valid(self, form):
+        self.object = form.save()
+        for f in self.request.FILES.getlist('files'):
+            BoardFile.objects.create(post=self.object, file=f, original_name=f.name)
+        return redirect('listings:board_detail', pk=self.object.pk)
 
 
 def _can_edit_post(user, post):
@@ -324,8 +335,9 @@ class BoardEditView(View):
         post = get_object_or_404(BoardPost, pk=pk)
         if _can_edit_post(request.user, post):
             form = BoardPostForm(instance=post, user=request.user)
+            file_formset = BoardFileFormSet(instance=post)
             return render(request, 'listings/board_form.html', {
-                'form': form, 'object': post, 'edit_mode': True
+                'form': form, 'object': post, 'edit_mode': True, 'file_formset': file_formset
             })
         password_form = BoardPasswordForm()
         return render(request, 'listings/board_password.html', {
@@ -336,16 +348,18 @@ class BoardEditView(View):
         post = get_object_or_404(BoardPost, pk=pk)
         if _can_edit_post(request.user, post):
             form = BoardPostForm(instance=post, user=request.user)
+            file_formset = BoardFileFormSet(instance=post)
             return render(request, 'listings/board_form.html', {
-                'form': form, 'object': post, 'edit_mode': True
+                'form': form, 'object': post, 'edit_mode': True, 'file_formset': file_formset
             })
         password_form = BoardPasswordForm(request.POST)
         if password_form.is_valid():
             if post.check_password(password_form.cleaned_data['password']):
                 form = BoardPostForm(instance=post)
                 form.fields.pop('raw_password', None)
+                file_formset = BoardFileFormSet(instance=post)
                 return render(request, 'listings/board_form.html', {
-                    'form': form, 'object': post, 'edit_mode': True
+                    'form': form, 'object': post, 'edit_mode': True, 'file_formset': file_formset
                 })
             else:
                 messages.error(request, '비밀번호가 일치하지 않습니다.')
@@ -362,9 +376,16 @@ class BoardUpdateView(View):
             post.writer_name = request.POST.get('writer_name', post.writer_name)
         post.title = request.POST.get('title', post.title)
         post.content = request.POST.get('content', post.content)
-        if request.FILES.get('file1'):
-            post.file1 = request.FILES['file1']
         post.save()
+        # Handle file formset
+        file_formset = BoardFileFormSet(request.POST, request.FILES, instance=post)
+        if file_formset.is_valid():
+            files = file_formset.save(commit=False)
+            for f in files:
+                f.original_name = f.file.name
+                f.save()
+            for f in file_formset.deleted_objects:
+                f.delete()
         return redirect('listings:board_detail', pk=post.pk)
 
 

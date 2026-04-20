@@ -1,5 +1,5 @@
 from django import forms
-from .models import Property, PropertyImage, Report, BoardPost
+from .models import Property, PropertyImage, Report, BoardPost, BoardFile
 
 
 class PropertyForm(forms.ModelForm):
@@ -85,6 +85,21 @@ class BoardPostForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
+
+class BoardFileForm(forms.ModelForm):
+    class Meta:
+        model = BoardFile
+        fields = ['file']
+
+
+BoardFileFormSet = forms.inlineformset_factory(
+    BoardPost, BoardFile,
+    form=BoardFileForm,
+    extra=3,
+    max_num=10,
+    can_delete=True,
+)
 
 
 class BoardPasswordForm(forms.Form):

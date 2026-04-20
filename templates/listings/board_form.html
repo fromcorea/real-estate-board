@@ -3,8 +3,9 @@
 {% block title %}{% if object %}글 수정{% else %}글 작성{% endif %} - 매물공유 - 집구하자{% endblock %}
 
 {% block extra_css %}
-<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
-<style>#editor-container { height: 300px; background: #fff; }</style>
+<style>
+    .tox-tinymce { border-radius: 0 0 4px 4px !important; }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -30,7 +31,7 @@
                 <table class="table table-bordered">
                     <tr>
                         <th class="table-light" style="width:120px;">분류 <span class="text-danger">*</span></th>
-                        <td>{{ form.category|add_class:"form-select form-select-sm" }}</td>
+                        <td>{{ form.category|add_class:"form-select form-select-sm"|attr:"style:max-width:200px" }}</td>
                     </tr>
                     {% if not form.writer_name.is_hidden %}
                     <tr>
@@ -47,18 +48,40 @@
                     <tr>
                         <th class="table-light">글내용 <span class="text-danger">*</span></th>
                         <td>
-                            <div id="editor-container"></div>
-                            <textarea name="content" id="id_board_content" style="display:none;">{% if form.content.value %}{{ form.content.value }}{% endif %}</textarea>
+                            <textarea name="content" id="id_board_content" class="form-control">{% if form.content.value %}{{ form.content.value }}{% endif %}</textarea>
                         </td>
                     </tr>
                     <tr>
                         <th class="table-light">파일첨부</th>
                         <td>
-                            {{ form.file1|add_class:"form-control form-control-sm" }}
-                            {% if object and object.file1 %}
-                            <small class="text-muted mt-1 d-block">현재 파일: <a href="{{ object.file1.url }}" target="_blank">{{ object.file1.name }}</a></small>
+                            {% if file_formset %}
+                            {{ file_formset.management_form }}
+                            {% for ff in file_formset %}
+                            <div class="mb-2 d-flex align-items-center gap-2">
+                                {% for field in ff.hidden_fields %}{{ field }}{% endfor %}
+                                {% if ff.instance.pk and ff.instance.file %}
+                                <small class="text-muted">{{ ff.instance.original_name }}</small>
+                                {% for field in ff.visible_fields %}
+                                    {% if field.name == 'DELETE' %}
+                                    <div class="form-check">{{ field }} <label class="form-check-label small text-danger" for="{{ field.id_for_label }}">삭제</label></div>
+                                    {% elif field.name == 'file' %}
+                                    {% endif %}
+                                {% endfor %}
+                                {% else %}
+                                {% for field in ff.visible_fields %}
+                                    {% if field.name == 'file' %}
+                                    {{ field|add_class:"form-control form-control-sm" }}
+                                    {% elif field.name == 'DELETE' %}
+                                    {% endif %}
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                            {% else %}
+                            <!-- 신규 등록: 단순 다중 파일 -->
+                            <input type="file" name="files" class="form-control form-control-sm" multiple>
                             {% endif %}
-                            <small class="text-danger">* 사진은 가로 300픽셀 이하로 줄여서 올려 주시기 바랍니다.</small>
+                            <small class="text-muted">최대 10개까지 첨부 가능합니다.</small>
                         </td>
                     </tr>
                     {% if form.raw_password and not edit_mode %}
@@ -87,36 +110,25 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 <script>
-const quill = new Quill('#editor-container', {
-    theme: 'snow',
-    placeholder: '매물 정보를 입력하세요...',
-    modules: {
-        toolbar: [
-            [{ 'header': [1, 2, 3, false] }],
-            ['bold', 'italic', 'underline', 'strike'],
-            [{ 'color': [] }, { 'background': [] }],
-            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-            [{ 'align': [] }],
-            ['link', 'image'],
-            ['clean']
-        ]
+tinymce.init({
+    selector: '#id_board_content',
+    height: 400,
+    language: 'ko_KR',
+    menubar: true,
+    plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount',
+    toolbar: 'undo redo | blocks | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media | removeformat | code fullscreen',
+    content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 14px; }',
+    branding: false,
+    promotion: false,
+    images_upload_handler: function(blobInfo) {
+        return new Promise(function(resolve, reject) {
+            var reader = new FileReader();
+            reader.onloadend = function() { resolve(reader.result); };
+            reader.readAsDataURL(blobInfo.blob());
+        });
     }
-});
-const textarea = document.getElementById('id_board_content');
-const existing = textarea.value;
-if (existing) {
-    if (existing.startsWith('<')) { quill.root.innerHTML = existing; }
-    else { quill.setText(existing); }
-}
-quill.on('text-change', function() {
-    const html = quill.root.innerHTML;
-    textarea.value = (html === '<p><br></p>') ? '' : html;
-});
-document.querySelector('form').addEventListener('submit', function() {
-    const html = quill.root.innerHTML;
-    textarea.value = (html === '<p><br></p>') ? '' : html;
 });
 </script>
 {% endblock %}
