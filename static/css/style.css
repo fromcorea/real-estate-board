@@ -1,6 +1,5 @@
-html, body {
+html {
     overflow-x: hidden;
-    width: 100%;
 }
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -8,8 +7,7 @@ body {
     display: flex;
     flex-direction: column;
 }
-.row { margin-left: 0; margin-right: 0; }
-.container, .container-fluid { overflow-x: hidden; }
+.navbar .dropdown-menu { z-index: 1060; }
 
 /* Hero */
 .hero-section {
