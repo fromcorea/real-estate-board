@@ -61,12 +61,14 @@ class BoardPostForm(forms.ModelForm):
         model = BoardPost
         fields = ['category', 'writer_name', 'title', 'content', 'file1']
         widgets = {
+            'category': forms.Select(attrs={'class': 'form-select form-select-sm'}),
             'content': forms.Textarea(attrs={'id': 'id_board_content'}),
         }
 
     def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = user
+        self.fields['category'].empty_label = '분류'
         if user and user.is_authenticated:
             self.fields['writer_name'].required = False
             self.fields['writer_name'].widget = forms.HiddenInput()

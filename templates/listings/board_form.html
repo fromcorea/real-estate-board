@@ -3,9 +3,7 @@
 {% block title %}{% if object %}글 수정{% else %}글 작성{% endif %} - 매물공유 - 집구하자{% endblock %}
 
 {% block extra_css %}
-<style>
-    .tox-tinymce { border-radius: 0 0 4px 4px !important; }
-</style>
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs5.min.css" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -109,25 +107,26 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/lang/summernote-ko-KR.min.js"></script>
 <script>
-tinymce.init({
-    selector: '#id_board_content',
-    height: 400,
-    language: 'ko_KR',
-    menubar: true,
-    plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount',
-    toolbar: 'undo redo | blocks | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media | removeformat | code fullscreen',
-    content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 14px; }',
-    branding: false,
-    promotion: false,
-    images_upload_handler: function(blobInfo) {
-        return new Promise(function(resolve, reject) {
-            var reader = new FileReader();
-            reader.onloadend = function() { resolve(reader.result); };
-            reader.readAsDataURL(blobInfo.blob());
-        });
-    }
+$('#id_board_content').summernote({
+    height: 350,
+    lang: 'ko-KR',
+    toolbar: [
+        ['style', ['style']],
+        ['font', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
+        ['fontname', ['fontname']],
+        ['fontsize', ['fontsize']],
+        ['color', ['color']],
+        ['para', ['ul', 'ol', 'paragraph']],
+        ['table', ['table']],
+        ['insert', ['link', 'picture', 'video', 'hr']],
+        ['view', ['fullscreen', 'codeview', 'help']]
+    ],
+    fontNames: ['맑은 고딕', '굴림', '돋움', '바탕', 'Arial', 'Times New Roman'],
+    fontSizes: ['8','9','10','11','12','14','16','18','20','24','28','36'],
 });
 
 // Dynamic file formset
