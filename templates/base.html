@@ -56,13 +56,14 @@
                         <li>
                             <form method="post" action="{% url 'accounts:logout' %}">
                                 {% csrf_token %}
+                                <input type="hidden" name="next" value="{{ request.path }}">
                                 <button class="dropdown-item" type="submit"><i class="bi bi-box-arrow-right me-2"></i>로그아웃</button>
                             </form>
                         </li>
                     </ul>
                 </li>
                 {% else %}
-                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:login' %}">로그인</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:login' %}?next={{ request.path }}">로그인</a></li>
                 <li class="nav-item"><a class="nav-link btn btn-outline-light btn-sm ms-2 px-3" href="{% url 'accounts:signup' %}">회원가입</a></li>
                 {% endif %}
             </ul>
